@@ -1,0 +1,19 @@
+# Сборка Maven (скомпилированные .class файлы и jar-артефакты)
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Настройки IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Конфиги с секретами (СЮДА КЛАДЕМ ТОКЕН БОТА — ни в коем случае не пушить!)
+*.properties
+*.env
+config.local
+
+# Системный мусор ОС
+.DS_Store
+Thumbs.db
