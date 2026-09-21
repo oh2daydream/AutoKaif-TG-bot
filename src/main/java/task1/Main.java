@@ -18,6 +18,7 @@ public class Main {
             String output=handler.handle(input);
             System.out.println("РЕзультат: " + output);
         }
+        scan.close();
     }
 
 }
