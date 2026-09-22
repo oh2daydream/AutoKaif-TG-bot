@@ -1,33 +1,39 @@
 package service;
 
 import model.Refueling;
-
+import repository.RefuelingRepository;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RefuelingService {
 
-    private final List<Refueling> refuelings = new ArrayList<>();
+    private final RefuelingRepository repository;
+
+    public RefuelingService(RefuelingRepository repository) {
+        this.repository = repository;
+    }
+
     public void addRefueling(Refueling refueling){
         if(refueling!=null){
-            refuelings.add(refueling);
+            repository.save(refueling);
         }
     }
     public List<Refueling> getAllRefuelings(){
-        return new ArrayList<>(refuelings);
+        return repository.findAll();
     }
     public double calculateTotalCost(){
         double total = 0.0;
-        for(Refueling refueling : refuelings){
+        for(Refueling refueling : repository.findAll()){
             total+=refueling.getTotalCost();
         }
         return total;
     }
     public double calculateAverageConsumption(){
-        if (refuelings.size() < 2)
+        List<Refueling> records = repository.findAll();
+        if (records.size() < 2)
             return 0.0;
-        Refueling firstRefueling = refuelings.getFirst();
-        Refueling lastRefueling = refuelings.getLast();
+        Refueling firstRefueling = records.getFirst();
+        Refueling lastRefueling = records.getLast();
 
         int totalDistance = lastRefueling.getMileage()-firstRefueling.getMileage();
 
@@ -35,17 +41,31 @@ public class RefuelingService {
             return 0.0;
 
         double totalLiters = 0.0;
-        for(int i=1; i<refuelings.size();i++){
-            totalLiters+=refuelings.get(i).getLiters();
+        for(int i=1; i<records.size();i++){
+            totalLiters+=records.get(i).getLiters();
         }
         return (totalLiters/totalDistance)*100;
     }
     public double calculateLastIntervalConsumption(){
-        if (refuelings.size()<2){
+        List<Refueling> records = repository.findAll()
+        if (records.size()<2){
             return 0.0;
         }
-        int distance = refuelings.getLast().getMileage()-refuelings.get(refuelings.size()-1).getMileage();
+        int distance = records.getLast().getMileage()-records.get(records.size()-1).getMileage();
         if(distance <=0 ) return 0.0;
-        return (refuelings.getLast().getLiters()/distance) * 100;
+        return (records.getLast().getLiters()/distance) * 100;
+    }
+    public double calculateKilometrPerRuble(){
+        List<Refueling> records = repository.findAll();
+        if(records.size()<2){
+            return 0.0;
+        }
+        int totalSum = 0;
+        for(Refueling refueling : repository.findAll()){
+            totalSum+=refueling.getTotalCost();
+        }
+        int distance = records.getLast().getMileage()-records.getFirst().getMileage();
+        if(distance<=0) return 0.0;
+        return (totalSum/distance);
     }
 }
