@@ -7,6 +7,7 @@ public class Refueling {
     private double liters;
     private double totalCost;
     private LocalDate date;
+    private int id;
 
     public Refueling(int mileage, double liters, double totalCost, LocalDate date){
         this.mileage=mileage;
@@ -14,7 +15,10 @@ public class Refueling {
         this.totalCost=totalCost;
         this.date=date;
     }
-
+    public void setId(int id){
+        this.id=id;
+    }
+    public int getId() {return id;}
     public double getTotalCost() {
         return totalCost;
     }
