@@ -2,7 +2,6 @@ package service;
 
 import model.Refueling;
 import repository.RefuelingRepository;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RefuelingService {
@@ -47,7 +46,7 @@ public class RefuelingService {
         return (totalLiters/totalDistance)*100;
     }
     public double calculateLastIntervalConsumption(){
-        List<Refueling> records = repository.findAll()
+        List<Refueling> records = repository.findAll();
         if (records.size()<2){
             return 0.0;
         }
