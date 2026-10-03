@@ -11,7 +11,7 @@ public class CarService {
     }
     //геттер-------------------
     public Car getCar() {
-        return currentCar;
+        return this.currentCar;
     }
     //проверки-------------------
     public boolean hasCar() { //чтобы не давать заправляться или обновлять пробег, пока машина не создана
@@ -21,4 +21,5 @@ public class CarService {
         if (currentCar == null) return false;
         return currentCar.updateMileage(newMileage);
     }
+
 }
