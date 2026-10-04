@@ -23,7 +23,7 @@ public class Refueling {
     public void setId(int id){
         this.id=id;
     }
-    public int getCarId() {return id;}
+    public int getCarId() {return carId;}
     public int getMileage() {
         return mileage;
     }

@@ -126,7 +126,7 @@ public class RefuelingService {
         }
         return accumulatedCost / distance;
     }
-    public FuelStats calculacteFuelStats(int carId){
+    public FuelStats calculateFuelStats(int carId){
         List<Refueling> records = getAllRefuelingsByCarId(carId);
         if(records.isEmpty()){return null;}
         FuelStats stats = new FuelStats();
