@@ -2,6 +2,8 @@ package service;
 import model.Car;
 import repository.CarRepository;
 
+import java.util.List;
+
 public class CarService {
     private final CarRepository carRepository;
 
@@ -22,11 +24,19 @@ public class CarService {
     public boolean hasCar() { //чтобы не давать заправляться или обновлять пробег, пока машина не создана
         return carRepository.getCar() != null;
     }
-    public boolean updateMileage(int newMileage) {
-        Car car = carRepository.getCar();
-        if (car == null) return false;
-        boolean updated = car.updateMileage(newMileage);
-        if (updated) { carRepository.save(car); }
-        return updated;
+    public boolean updateMileage(int carId,int newMileage) {
+        for(Car car : carRepository.findAll()){
+            if(car.getId()==carId){
+                boolean updated = car.updateMileage(newMileage);
+                if (updated){
+                    carRepository.save(car);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    public List<Car> getAllCars(){
+        return carRepository.findAll();
     }
 }

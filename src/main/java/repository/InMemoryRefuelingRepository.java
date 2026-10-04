@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class InMemoryRefuelingRepository implements RefuelingRepository {
     private final Map<Integer, Refueling> storage = new HashMap<>();
-    int currentId = 0;
+    private int currentId = 0;
 
     @Override
     public Refueling save(Refueling refueling) {

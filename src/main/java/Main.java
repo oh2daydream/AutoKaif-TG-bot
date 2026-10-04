@@ -16,7 +16,7 @@ public class Main {
         CarService carService = new CarService(carRepository);
         RefuelingService refuelingService = new RefuelingService(refuelingRepository);
 
-        BotCommandHandler botHabdler = new BotCommandHandler(refuelingService, carService);
+        BotCommandHandler botHandler = new BotCommandHandler(refuelingService, carService);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==================================================");
@@ -33,7 +33,7 @@ public class Main {
                 break;
             }
 
-            String botResponse = botHabdler.handleMessage(userInput);
+            String botResponse = botHandler.handleMessage(userInput);
             System.out.println("Бот: " + botResponse + "\n");
         }
         scanner.close();
