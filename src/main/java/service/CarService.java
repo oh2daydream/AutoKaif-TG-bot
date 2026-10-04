@@ -1,24 +1,32 @@
 package service;
 import model.Car;
+import repository.CarRepository;
 
 public class CarService {
-    private Car currentCar;
+    private final CarRepository carRepository;
+
+    public CarService(CarRepository carRepository) {
+        this.carRepository = carRepository;
+    }
 
     //методы-------------------
     public Car registerCar(String brand, String model, int year, double tankCapacity, int currentMileage) {
-        this.currentCar = new Car(brand, model, year, tankCapacity, currentMileage);
-        return this.currentCar;
+        Car car = new Car(brand, model, year, tankCapacity, currentMileage);
+        return carRepository.save(car);
     }
     //геттер-------------------
     public Car getCar() {
-        return currentCar;
+        return carRepository.getCar();
     }
     //проверки-------------------
     public boolean hasCar() { //чтобы не давать заправляться или обновлять пробег, пока машина не создана
-        return currentCar != null;
+        return carRepository.getCar() != null;
     }
     public boolean updateMileage(int newMileage) {
-        if (currentCar == null) return false;
-        return currentCar.updateMileage(newMileage);
+        Car car = carRepository.getCar();
+        if (car == null) return false;
+        boolean updated = car.updateMileage(newMileage);
+        if (updated) { carRepository.save(car); }
+        return updated;
     }
 }
