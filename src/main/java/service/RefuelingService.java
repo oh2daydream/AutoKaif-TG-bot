@@ -38,7 +38,7 @@ public class RefuelingService {
     }
     //Расчет расхода (л/100км) за все время
     public double calculateAverageConsumption(int carId){
-        List<Refueling> records = getAllRefuelingsByCarId(carId);
+        List<Refueling> records = getAllRefuelingsByCarId(carId);//чеки
         if (records.size() < 2)
             return 0.0;
         int firstFullIndex = -1;
