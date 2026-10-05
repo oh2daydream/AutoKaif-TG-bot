@@ -23,7 +23,7 @@ public class BotCommandHandler {
             this.activeCar = carService.getCar();
         }
     }
-
+    //Паттерн конченого автомата
     private enum State {
         IDLE,
         // Шаги машины
@@ -38,7 +38,7 @@ public class BotCommandHandler {
         WAITING_REFUEL_COST,
         WAITING_REFUEL_IS_FULL;
     }
-
+    //Поля(буфера памяти)
     private State currentState = State.IDLE;
     private int tempRefuelMileage;
     private double tempRefuelLiters;
@@ -97,7 +97,7 @@ public class BotCommandHandler {
                     "/help - Справка";
         } else {
             return "👋 Привет! Я бот бортового журнала AutoKaif.\n\n" +
-                    "Ваш гараж пока пуст. Зарегистрируйте свой первый автомобиль через команду /addcar.\n"+
+                    "Ваш гараж пока пуст. Зарегистрируйте свой первый автомобиль через команду /addcar.\n" +
                     "Чтобы посмотреть все доступные команды напишите /help";
         }
     }
@@ -299,92 +299,81 @@ public class BotCommandHandler {
             sb.append("\n");
         }
         sb.append("🛢 ТОПЛИВО:\n");
-        sb.append(String.format("• Всего залито:  %.2f л (в ср. %.2f л, посл: %.2f л)\n",stats.totalLiters,stats.avgLiters,stats.lastLiters));
-        sb.append(String.format("• Цена за литр:  в ср. %.2f ₽ (посл: %.2f ₽)\n\n",stats.avgPricePerLiter,stats.lastPricePerLiter));
+        sb.append(String.format("• Всего залито:  %.2f л (в ср. %.2f л, посл: %.2f л)\n", stats.totalLiters, stats.avgLiters, stats.lastLiters));
+        sb.append(String.format("• Цена за литр:  в ср. %.2f ₽ (посл: %.2f ₽)\n\n", stats.avgPricePerLiter, stats.lastPricePerLiter));
         sb.append("💰 РАСХОДЫ:\n");
-        sb.append(String.format("• Всего трат:    %.2f ₽ (ср. чек: %.2f ₽, посл: %.2f ₽)\n",stats.totalCost,stats.avgCost,stats.lastCost));
+        sb.append(String.format("• Всего трат:    %.2f ₽ (ср. чек: %.2f ₽, посл: %.2f ₽)\n", stats.totalCost, stats.avgCost, stats.lastCost));
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        if(stats.avgConsumption >0)
-
-    {
-        sb.append(String.format("⭐️ Средний расход: %.2f л/100 км", stats.avgConsumption));
-        if (stats.avgKmPerLiter > 0) {
-            sb.append(String.format(" (%.2f км/л)", stats.avgKmPerLiter));
+        if (stats.avgConsumption > 0) {
+            sb.append(String.format("⭐️ Средний расход: %.2f л/100 км (%.2f км/л)\n", stats.avgConsumption, stats.avgKmPerLiter));
+        } else {
+            sb.append("ℹ️ Средний расход: требуется от 2 заправок «до полного бака».\n");
         }
-        sb.append("\n");
-    } else
-
-    {
-        sb.append("ℹ️ Средний расход: требуется от 2 заправок «до полного бака».\n");
-    }
-        if(stats.lastConsumption >0)
-
-    {
-        sb.append(String.format("🏁 Последний бак:  %.2f л/100 км (%.2f км/л)\n",
-                stats.lastConsumption, stats.lastKmPerLiter));
-    }
+        if (stats.lastConsumption > 0) {
+            sb.append(String.format("🏁 Последний бак:  %.2f л/100 км (%.2f км/л)\n", stats.lastConsumption, stats.lastKmPerLiter));
+        }
         return sb.toString();
-}
+    }
 
-private String buildHistoryMessage() {
-    if (activeCar == null) {
-        return "Гараж пуст. Сначала зарегистрируйте автомобиль через /addcar";
+    private String buildHistoryMessage() {
+        if (activeCar == null) {
+            return "Гараж пуст. Сначала зарегистрируйте автомобиль через /addcar";
+        }
+        List<Refueling> records = refuelingService.getAllRefuelingsByCarId(activeCar.getId());
+        if (records.isEmpty()) {
+            return "Журнал заправок автомобиля [" + activeCar.getBrand() + " " + activeCar.getModel() + " ] пуст.";
+        }
+        StringBuilder sb = new StringBuilder("📋 ЖУРНАЛ ЗАПРАВОК:\n");
+        for (int i = 0; i < records.size(); i++) {
+            sb.append(i + 1).append(". ").append(records.get(i).toString()).append("\n");
+        }
+        return sb.toString();
     }
-    List<Refueling> records = refuelingService.getAllRefuelingsByCarId(activeCar.getId());
-    if (records.isEmpty()) {
-        return "Журнал заправок автомобиля [" + activeCar.getBrand() + " " + activeCar.getModel() + " ] пуст.";
-    }
-    StringBuilder sb = new StringBuilder("📋 ЖУРНАЛ ЗАПРАВОК:\n");
-    for (int i = 0; i < records.size(); i++) {
-        sb.append(i + 1).append(". ").append(records.get(i).toString()).append("\n");
-    }
-    return sb.toString();
-}
 
-private String processCommand(String command) {
-    String[] tokens = command.split("\\s+");
-    String mainCommand = tokens[0].toLowerCase();
-    switch (mainCommand) {
-        case "/start":
-            return handleStart();
-        case "/help":
-            return "ℹ️ Справка по командам:\n" +
-                    "/addcar - Добавить автомобиль в гараж\n" +
-                    "/garage - Посмотреть все автомобили\n" +
-                    "/select <id> - Выбрать активный автомобиль (например: /select 1)\n" +
-                    "/car - Карточка текущего активного авто\n" +
-                    "/refuel - Записать новую заправку\n" +
-                    "/stats - Статистика расхода топлива\n" +
-                    "/history - Журнал чеков заправок\n" +
-                    "Для выхода напишите 'exit'.";
-        case "/addcar":
-            currentState = State.WAITING_CAR_BRAND;
-            return "🚗 Добавление автомобиля.\n" +
-                    "Шаг 1 из 5: Введите марку (например, Volkswagen):\n" +
-                    "(для отмены напишите /cancel)";
-        case "/garage":
-            return buildGarageMessage();
-        case "/select":
-            return handleSelectCar(tokens);
-        case "/car":
-            if (activeCar == null) {
-                return "Гараж пуст. Добавьте машину через /addcar.";
-            }
-            return "Текущий активный профиль:\n" + activeCar.toString();
-        case "/refuel":
-            if (activeCar == null) {
-                return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
-                        "Сначала добавьте машину командой /addcar.";
-            }
-            currentState = State.WAITING_REFUEL_MILEAGE;
-            return "⛽ Заправка для [" + activeCar.getBrand() + " " + activeCar.getModel() + "]\n" +
-                    "Шаг 1 из 4: Введите текущий пробег (на одометре не менее\n" + activeCar.getCurrentMileage() + " км):\n" + "(для отмены напишите /cancle)";
-        case "/stats":
-            return buildStatsMessage();
-        case "/history":
-            return buildHistoryMessage();
-        default:
-            return "❓ Неизвестная команда. Введите /help для просмотра списка доступных действий.";
+    private String processCommand(String command) {
+        String[] tokens = command.split("\\s+");
+        String mainCommand = tokens[0].toLowerCase();
+        switch (mainCommand) {
+            case "/start":
+                return handleStart();
+            case "/help":
+                return "ℹ️ Справка по командам:\n" +
+                        "/addcar - Добавить автомобиль в гараж\n" +
+                        "/garage - Посмотреть все автомобили\n" +
+                        "/select <id> - Выбрать активный автомобиль (например: /select 1)\n" +
+                        "/car - Карточка текущего активного авто\n" +
+                        "/refuel - Записать новую заправку\n" +
+                        "/stats - Статистика расхода топлива\n" +
+                        "/history - Журнал чеков заправок\n" +
+                        "Для выхода напишите 'exit'.";
+            case "/addcar":
+                currentState = State.WAITING_CAR_BRAND;
+                return "🚗 Добавление автомобиля.\n" +
+                        "Шаг 1 из 5: Введите марку (например, Volkswagen):\n" +
+                        "(для отмены напишите /cancel)";
+            case "/garage":
+                return buildGarageMessage();
+            case "/select":
+                return handleSelectCar(tokens);
+            case "/car":
+                if (activeCar == null) {
+                    return "Гараж пуст. Добавьте машину через /addcar.";
+                }
+                return "Текущий активный профиль:\n" + activeCar.toString();
+            case "/refuel":
+                if (activeCar == null) {
+                    return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
+                            "Сначала добавьте машину командой /addcar.";
+                }
+                currentState = State.WAITING_REFUEL_MILEAGE;
+                return "⛽ Заправка для [" + activeCar.getBrand() + " " + activeCar.getModel() + "]\n" +
+                        "Шаг 1 из 4: Введите текущий пробег (на одометре не менее " + activeCar.getCurrentMileage() + " км):\n" + "(для отмены напишите /cancel)";
+            case "/stats":
+                return buildStatsMessage();
+            case "/history":
+                return buildHistoryMessage();
+            default:
+                return "❓ Неизвестная команда. Введите /help для просмотра списка доступных действий.";
+        }
     }
-}
 }

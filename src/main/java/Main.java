@@ -1,13 +1,13 @@
 import handler.BotCommandHandler;
-import model.Refueling;
-import repository.InMemoryRefuelingRepository;
-import repository.InMemoryCarRepository;
-import repository.RefuelingRepository;
 import repository.CarRepository;
+import repository.InMemoryCarRepository;
+import repository.InMemoryRefuelingRepository;
+import repository.RefuelingRepository;
 import service.CarService;
 import service.RefuelingService;
 
-import java.util.*;
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args){
         CarRepository carRepository = new InMemoryCarRepository();
@@ -25,7 +25,7 @@ public class Main {
         System.out.println("==================================================\n");
 
         while (true){
-            System.out.println("Вы: ");
+            System.out.println("Вы :");
             String userInput = scanner.nextLine();
 
             if("exit".equalsIgnoreCase(userInput.trim()) || "выход".equalsIgnoreCase(userInput.trim())){
