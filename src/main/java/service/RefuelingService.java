@@ -49,12 +49,15 @@ public class RefuelingService {
                 break;
             }
         }
-        for(int i=records.size()-1; i>=0; i--){
-            if(records.get(i).isFullTank()){
-                lastFullIndex = i;
-                break;
+        if(firstFullIndex != -1){
+            for(int i=records.size()-1; i>=0; i--){
+                if(records.get(i).isFullTank()){
+                    lastFullIndex = i;
+                    break;
+                }
             }
         }
+
         if (firstFullIndex == -1 || lastFullIndex == -1 || firstFullIndex == lastFullIndex) {
             return 0.0;
         }

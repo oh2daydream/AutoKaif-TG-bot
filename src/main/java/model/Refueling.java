@@ -1,17 +1,17 @@
 package model;
 
 import java.time.LocalDate;
-
+import java.util.UUID;
 public class Refueling {
-    private int id;
-    private int carId;
+    private UUID id;
+    private UUID carId;
     private int mileage;
     private double liters;
     private double totalCost;
     private LocalDate date;
     private boolean isFullTank;
 
-    public Refueling(int carId,int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank){
+    public Refueling(UUID carId,int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank){
         this.carId=carId;
         this.mileage=mileage;
         this.liters=liters;
@@ -19,11 +19,8 @@ public class Refueling {
         this.date=date;
         this.isFullTank = isFullTank;
     }
-    public int getId(){return id;}
-    public void setId(int id){
-        this.id=id;
-    }
-    public int getCarId() {return carId;}
+    public UUID getId(){return id;}
+    public UUID getCarId() {return carId;}
     public int getMileage() {
         return mileage;
     }
