@@ -19,7 +19,7 @@ public class RefuelingService {
         }
     }
     // Возвращает все чеки по id машины для того чтобы высчитать статистику
-    public List<Refueling> getAllRefuelingsByCarId(int carId){
+    public List<Refueling> getAllRefuelingsByCarId(UUID carId){
         List<Refueling> carRecords = new ArrayList<>();
         for(Refueling r : repository.findAll()){
             if(r.getCarId() == carId){
@@ -29,7 +29,7 @@ public class RefuelingService {
         return carRecords;
     }
 //    общая сумма всех заправок на одной машине
-    public double calculateTotalCost(int carId){
+    public double calculateTotalCost(UUID carId){
         double total = 0.0;
         for(Refueling refueling : getAllRefuelingsByCarId(carId)){
             total+=refueling.getTotalCost();
@@ -37,7 +37,7 @@ public class RefuelingService {
         return total;
     }
     //Расчет расхода (л/100км) за все время
-    public double calculateAverageConsumption(int carId){
+    public double calculateAverageConsumption(UUID carId){
         List<Refueling> records = getAllRefuelingsByCarId(carId);//чеки
         if (records.size() < 2)
             return 0.0;
@@ -72,7 +72,7 @@ public class RefuelingService {
         return (totalLiters/totalDistance)*100;
     }
     //Расчет расхода за последние две заправки
-    public double calculateLastIntervalConsumption(int carId){
+    public double calculateLastIntervalConsumption(UUID carId){
         List<Refueling> records = getAllRefuelingsByCarId(carId);
         if (records.size()<2){
             return 0.0;
@@ -102,7 +102,7 @@ public class RefuelingService {
         return (accumulatedLiters/distance) * 100;
     }
     //Расчет сколько стоит один километр
-    public double calculateLastIntervalCostPerKm(int carId){
+    public double calculateLastIntervalCostPerKm(UUID carId){
         List<Refueling> records = getAllRefuelingsByCarId(carId);
         if(records.size()<2){
             return 0.0;
@@ -129,7 +129,7 @@ public class RefuelingService {
         }
         return accumulatedCost / distance;
     }
-    public FuelStats calculateFuelStats(int carId){
+    public FuelStats calculateFuelStats(UUID carId){
         List<Refueling> records = getAllRefuelingsByCarId(carId);
         if(records.isEmpty()){return null;}
         FuelStats stats = new FuelStats();
