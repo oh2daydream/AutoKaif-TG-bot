@@ -12,42 +12,19 @@ import java.util.List;
 public class BotCommandHandler {
     private final RefuelingService refuelingService;
     private final CarService carService;
-
+    private final RefuelingAddHandler refuelingAddHandler;
+    private final CarAddHandler carAddHandler;
     private Car activeCar;
 
-    public BotCommandHandler(RefuelingService refuelingService, CarService carService) {
+    public BotCommandHandler(RefuelingService refuelingService, CarService carService, RefuelingAddHandler refuelingAddHandler, CarAddHandler carAddHandler) {
         this.refuelingService = refuelingService;
         this.carService = carService;
-
+        this.refuelingAddHandler = refuelingAddHandler;
+        this.carAddHandler = carAddHandler;
         if (carService.hasCar()) {
             this.activeCar = carService.getCar();
         }
     }
-    //Паттерн конченого автомата
-    private enum State {
-        IDLE,
-        // Шаги машины
-        WAITING_CAR_BRAND,
-        WAITING_CAR_MODEL,
-        WAITING_CAR_YEAR,
-        WAITING_CAR_TANK,
-        WAITING_CAR_MILEAGE,
-        // Шаги заправки
-        WAITING_REFUEL_MILEAGE,
-        WAITING_REFUEL_LITERS,
-        WAITING_REFUEL_COST,
-        WAITING_REFUEL_IS_FULL;
-    }
-    //Поля(буфера памяти)
-    private State currentState = State.IDLE;
-    private int tempRefuelMileage;
-    private double tempRefuelLiters;
-    private double tempCost;
-    private String tempBrand;
-    private String tempModel;
-    private int tempYear;
-    private double tempTank;
-
 
     public String handleMessage(String input) {
         if (input == null || input.trim().isEmpty()) {
@@ -55,34 +32,15 @@ public class BotCommandHandler {
         }
         String message = input.trim();
         if ("/cancel".equalsIgnoreCase(message)) {
-            currentState = State.IDLE;
             return "❌ Действие отменено.";
         }
-        switch (currentState) {
-            case IDLE:
-                return processCommand(message);
-            case WAITING_CAR_BRAND:
-                return processCarBrand(message);
-            case WAITING_CAR_MODEL:
-                return processCarModel(message);
-            case WAITING_CAR_YEAR:
-                return processCarYear(message);
-            case WAITING_CAR_TANK:
-                return processCarTank(message);
-            case WAITING_CAR_MILEAGE:
-                return processCarMileage(message);
-            case WAITING_REFUEL_MILEAGE:
-                return processRefuelMileage(message);
-            case WAITING_REFUEL_LITERS:
-                return processRefuelLiters(message);
-            case WAITING_REFUEL_COST:
-                return processRefuelCost(message);
-            case WAITING_REFUEL_IS_FULL:
-                return processRefuelIsFull(message);
-            default:
-                currentState = State.IDLE;
-                return "Неизвестное состояние диалога. Возврат в главное меню.";
+        //Вот тут будет проврека вводится ли данные новго автомобиля(леша ты тут пишешь)
+
+        //Это проверка на идет ли заправка
+        if(refuelingAddHandler.isActive()){
+            return refuelingAddHandler.handle(message);
         }
+        return processCommand(message);
     }
 
     private String handleStart() {
@@ -140,141 +98,6 @@ public class BotCommandHandler {
             return "⚠️ Некорректный ID. Введите число. Пример: /select 1";
         }
     }
-
-    private String processCarBrand(String message) {
-        this.tempBrand = message;
-        currentState = State.WAITING_CAR_MODEL;
-        return "Шаг 2 из 5: Введите модель (например, Polo):";
-    }
-
-    private String processCarModel(String message) {
-        this.tempModel = message;
-        currentState = State.WAITING_CAR_YEAR;
-        return "Шаг 3 из 5: Введите год выпуска (например, 2018):";
-    }
-
-    private String processCarYear(String message) {
-        try {
-            int year = Integer.parseInt(message);
-            if (year < 1900 || year > 2030) {
-                return "⚠️ Неправдоподобный год выпуска. Попробуйте снова:";
-            }
-            this.tempYear = year;
-            currentState = State.WAITING_CAR_TANK;
-            return "Шаг 4 из 5: Введите объём топливного бака в литрах (например, 55):";
-        } catch (NumberFormatException e) {
-            return "⚠️ Год должен быть целым числом. Попробуйте снова:";
-        }
-    }
-
-    private String processCarTank(String message) {
-        try {
-            double tank = Double.parseDouble(message.replace(',', '.'));
-            if (tank <= 0 || tank > 500) {
-                return "⚠️ Объём бака должен быть от 1 до 500 литров. Попробуйте снова:";
-            }
-            this.tempTank = tank;
-            currentState = State.WAITING_CAR_MILEAGE;
-            return "Шаг 5 из 5: Введите текущий пробег в километрах (например, 120000):";
-        } catch (NumberFormatException e) {
-            return "⚠️ Объём бака должен быть числом. Попробуйте снова:";
-        }
-    }
-
-    private String processCarMileage(String message) {
-        try {
-            int mileage = Integer.parseInt(message);
-            if (mileage < 0) {
-                return "⚠️️ Пробег не может быть отрицательным. Попробуйте снова:";
-            }
-
-            Car newCar = new Car(tempBrand, tempModel, tempYear, tempTank, mileage);
-            Car savedCar = carService.registerCar(tempBrand, tempModel, tempYear, tempTank, mileage);
-
-            this.activeCar = (savedCar != null) ? savedCar : newCar;
-            currentState = State.IDLE;
-
-            return "🎉 Автомобиль " + tempBrand + " " + tempModel + " (" + tempYear + ") успешно добавлен!\n" +
-                    "Он выбран как активный. Теперь можно вносить заправки командой /refuel.";
-        } catch (NumberFormatException e) {
-            return "⚠️ Пробег должен быть целым числом. Попробуйте снова:";
-        }
-    }
-
-    private String processRefuelMileage(String message) {
-        try {
-            int mileage = Integer.parseInt(message);
-            if (mileage < activeCar.getCurrentMileage()) {
-                return "⚠️ Ошибка: пробег не может быть меньше текущего пробега авто (" +
-                        activeCar.getCurrentMileage() + " км). Попробуйте снова:";
-            }
-            this.tempRefuelMileage = mileage;
-            currentState = State.WAITING_REFUEL_LITERS;
-            return "Шаг 2 из 4: Введите кол-во заправленных литров(например 42,3):";
-        } catch (NumberFormatException e) {
-            return "⚠️ Пробег должен быть целым числом. Попробуйте снова:";
-        }
-    }
-
-    private String processRefuelLiters(String message) {
-        try {
-            double liters = Double.parseDouble(message.replace(',', '.'));
-            if (liters <= 0) {
-                return "⚠️ Количество литров должно быть строго больше 0. Попробуйте снова:";
-            }
-            if (activeCar.getTankCapacity() > 0 && liters > activeCar.getTankCapacity() * 1.1) {
-                return "⚠️ Объём превышает бак авто (" + activeCar.getTankCapacity() +
-                        " л). Проверьте цифру и введите снова:";
-            }
-            this.tempRefuelLiters = liters;
-            currentState = State.WAITING_REFUEL_COST;
-            return "Шаг 3  из 4: Введите общую стоимость заправки в рублях(например 2345)";
-        } catch (NumberFormatException e) {
-            return "⚠️ Объём топлива должен быть числом. Попробуйте снова:";
-        }
-    }
-
-    private String processRefuelCost(String message) {
-        try {
-            double cost = Double.parseDouble(message.replace(',', '.'));
-            if (cost <= 0) {
-                return "⚠️ Стоимость должна быть строго больше 0. Попробуйте снова:";
-            }
-            this.tempCost = cost;
-            currentState = State.WAITING_REFUEL_IS_FULL;
-            return "Шаг 4 из 4: Скажите вы наполнили полный бак? да/нет\n";
-        } catch (NumberFormatException e) {
-            return "⚠️ Стоимость должна быть числом. Попробуйте снова:";
-        }
-    }
-
-    private String processRefuelIsFull(String message) {
-        boolean isYes = "да".equalsIgnoreCase(message);
-        boolean isNo = "нет".equalsIgnoreCase(message);
-        if (!isYes && !isNo) {
-            return "⚠️ Не понял ответ. Пожалуйста, напишите «да» или «нет»:\n(или /cancel для отмены)";
-        }
-        boolean isFull = isYes;
-        Refueling refueling = new Refueling(
-                activeCar.getId(),
-                this.tempRefuelMileage,
-                this.tempRefuelLiters,
-                this.tempCost,
-                LocalDate.now(),
-                isFull
-        );
-        refuelingService.addRefueling(refueling);
-        activeCar.updateMileage(this.tempRefuelMileage);
-        carService.updateMileage(activeCar.getId(), this.tempRefuelMileage);
-        currentState = State.IDLE;
-        String tankStatus = isFull ? "до полного бака" : "частичная заправка";
-        return "✅ Заправка успешно сохранена (" + tankStatus + ")!\n" +
-                "• Пробег: " + this.tempRefuelMileage + " км\n" +
-                "• Залито: " + this.tempRefuelLiters + " л на сумму " + this.tempCost + " руб.\n\n" +
-                "Посмотреть обновлённую статистику: /stats";
-
-    }
-
     private String buildStatsMessage() {
         if (activeCar == null) {
             return "Гараж пуст. Сначала зарегистрируйте автомобиль через /addcar";
@@ -329,7 +152,14 @@ public class BotCommandHandler {
         }
         return sb.toString();
     }
-
+    private void syncActiveCar(){
+        List<Car> cars = carService.getAllCars();
+        if(!cars.isEmpty() && activeCar == null){
+            this.activeCar = cars.get(cars.size()-1);
+        } else if(!cars.isEmpty() && activeCar!=null){
+            this.activeCar = cars.get(cars.size()-1);
+        }
+    }
     private String processCommand(String command) {
         String[] tokens = command.split("\\s+");
         String mainCommand = tokens[0].toLowerCase();
@@ -347,27 +177,22 @@ public class BotCommandHandler {
                         "/history - Журнал чеков заправок\n" +
                         "Для выхода напишите 'exit'.";
             case "/addcar":
-                currentState = State.WAITING_CAR_BRAND;
-                return "🚗 Добавление автомобиля.\n" +
-                        "Шаг 1 из 5: Введите марку (например, Volkswagen):\n" +
-                        "(для отмены напишите /cancel)";
+                return carAddHandler.start();
             case "/garage":
                 return buildGarageMessage();
             case "/select":
                 return handleSelectCar(tokens);
             case "/car":
+                syncActiveCar();
                 if (activeCar == null) {
                     return "Гараж пуст. Добавьте машину через /addcar.";
                 }
                 return "Текущий активный профиль:\n" + activeCar.toString();
             case "/refuel":
-                if (activeCar == null) {
-                    return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
-                            "Сначала добавьте машину командой /addcar.";
-                }
-                currentState = State.WAITING_REFUEL_MILEAGE;
-                return "⛽ Заправка для [" + activeCar.getBrand() + " " + activeCar.getModel() + "]\n" +
-                        "Шаг 1 из 4: Введите текущий пробег (на одометре не менее " + activeCar.getCurrentMileage() + " км):\n" + "(для отмены напишите /cancel)";
+                syncActiveCar();
+                if(activeCar==null){return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
+                        "Сначала добавьте машину командой /addcar.";}
+                refuelingAddHandler.start(activeCar);
             case "/stats":
                 return buildStatsMessage();
             case "/history":
