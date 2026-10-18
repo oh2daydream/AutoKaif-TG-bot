@@ -1,14 +1,16 @@
 package model;
 
+import java.util.UUID;
+
 public class Car {
-    private int id;
+    private UUID id;
     private final String brand;
     private final String model;
     private final int year;
     private final double tankCapacity;
     private int currentMileage;
 
-    public Car(int id, String brand, String model, int year, double tankCapacity, int currentMileage) {
+    public Car(UUID id, String brand, String model, int year, double tankCapacity, int currentMileage) {
         this.id = id;
         this.brand = brand;
         this.model = model;
@@ -17,10 +19,10 @@ public class Car {
         this.currentMileage = currentMileage;
     }
     public Car(String brand, String model, int year, double tankCapacity, int currentMileage) {
-        this(0, brand, model, year, tankCapacity ,currentMileage);
+        this(null, brand, model, year, tankCapacity ,currentMileage);
     }
     //геттеры-----------------------------------------------------------------
-    public int getId() {
+    public UUID getId() {
         return id;
     }
     public String getBrand() {
@@ -39,7 +41,7 @@ public class Car {
         return currentMileage;
     }
     //сеттер-----------------------------------------------------------------
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     //методы-----------------------------------------------------------------

@@ -8,6 +8,7 @@ import service.RefuelingService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public class BotCommandHandler {
     private final RefuelingService refuelingService;
@@ -32,10 +33,19 @@ public class BotCommandHandler {
         }
         String message = input.trim();
         if ("/cancel".equalsIgnoreCase(message)) {
+            if (carAddHandler != null && carAddHandler.isActive()) {
+                carAddHandler.reset();
+            }
+            if (refuelingAddHandler != null && refuelingAddHandler.isActive()) {
+                refuelingAddHandler.reset();
+            }
+
             return "❌ Действие отменено.";
         }
         //Вот тут будет проврека вводится ли данные новго автомобиля(леша ты тут пишешь)
-
+        if (carAddHandler != null && carAddHandler.isActive()) {
+            return carAddHandler.handle(message);
+        }
         //Это проверка на идет ли заправка
         if(refuelingAddHandler.isActive()){
             return refuelingAddHandler.handle(message);
@@ -71,7 +81,7 @@ public class BotCommandHandler {
                     .append(car.getBrand()).append(" ").append(car.getModel())
                     .append(" (").append(car.getCurrentMileage()).append(" км)");
 
-            if (activeCar != null && activeCar.getId() == car.getId()) {
+            if (activeCar != null && activeCar.getId() != null && activeCar.getId().equals(car.getId())) {
                 sb.append(" ⭐️ [АКТИВЕН]");
             }
             sb.append("\n");
@@ -85,7 +95,7 @@ public class BotCommandHandler {
             return "⚠️ Укажите ID автомобиля. Например: /select 1\nСписок автомобилей: /garage";
         }
         try {
-            int selectedId = Integer.parseInt(tokens[1]);
+            UUID selectedId = UUID.fromString(tokens[1]);
             List<Car> cars = carService.getAllCars();
             for (Car car : cars) {
                 if (car.getId() == selectedId) {
@@ -94,7 +104,7 @@ public class BotCommandHandler {
                 }
             }
             return "❌ Автомобиль с ID " + selectedId + " не найден в гараже. Проверьте список через /garage.";
-        } catch (NumberFormatException e) {
+        } catch (IllegalArgumentException e) {
             return "⚠️ Некорректный ID. Введите число. Пример: /select 1";
         }
     }
@@ -192,7 +202,7 @@ public class BotCommandHandler {
                 syncActiveCar();
                 if(activeCar==null){return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
                         "Сначала добавьте машину командой /addcar.";}
-                refuelingAddHandler.start(activeCar);
+                return refuelingAddHandler.start(activeCar);
             case "/stats":
                 return buildStatsMessage();
             case "/history":
