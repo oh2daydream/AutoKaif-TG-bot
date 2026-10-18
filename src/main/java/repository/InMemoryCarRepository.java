@@ -1,19 +1,19 @@
 package repository;
 import model.Car;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryCarRepository implements CarRepository {
-    private final Map<Integer, Car> storage = new HashMap<>();
-    private int currentId = 1;
+    private final Map<UUID, Car> storage = new HashMap<>();
 
     @Override
     public Car save(Car car) {
-        if (car.getId() == 0) {
-            car.setId(currentId++);
+        if (car.getId() == null) {
+            car.setId(UUID.randomUUID());
         }
         storage.put(car.getId(), car);
         return car;
@@ -27,8 +27,12 @@ public class InMemoryCarRepository implements CarRepository {
         return storage.values().iterator().next();
     }
     @Override
-    public List<Car> findAll(){
-        return new ArrayList<>(storage.values());
+    public Car findById(UUID id) {
+        return storage.get(id);
     }
 
+    @Override
+    public List<Car> findAll() {
+        return new ArrayList<>(storage.values());
+    }
 }

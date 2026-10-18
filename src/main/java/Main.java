@@ -1,4 +1,7 @@
 import handler.BotCommandHandler;
+import handler.CarAddHandler;
+import handler.RefuelingAddHandler;
+
 import repository.CarRepository;
 import repository.InMemoryCarRepository;
 import repository.InMemoryRefuelingRepository;
@@ -16,7 +19,16 @@ public class Main {
         CarService carService = new CarService(carRepository);
         RefuelingService refuelingService = new RefuelingService(refuelingRepository);
 
-        BotCommandHandler botHandler = new BotCommandHandler(refuelingService, carService);
+        RefuelingAddHandler refuelingAddHandler = new RefuelingAddHandler(refuelingService, carService);
+        CarAddHandler carAddHandler = new CarAddHandler(carService);
+
+        BotCommandHandler botHandler = new BotCommandHandler(
+                refuelingService,
+                carService,
+                refuelingAddHandler,
+                carAddHandler
+        );
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==================================================");
