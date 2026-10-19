@@ -12,7 +12,7 @@ import service.RefuelingService;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         CarRepository carRepository = new InMemoryCarRepository();
         RefuelingRepository refuelingRepository = new InMemoryRefuelingRepository();
 
@@ -36,11 +36,11 @@ public class Main {
         System.out.println("Напишите /start для начала или 'exit' для выхода.");
         System.out.println("==================================================\n");
 
-        while (true){
+        while (true) {
             System.out.println("Вы :");
             String userInput = scanner.nextLine();
 
-            if("exit".equalsIgnoreCase(userInput.trim()) || "выход".equalsIgnoreCase(userInput.trim())){
+            if ("exit".equalsIgnoreCase(userInput.trim()) || "выход".equalsIgnoreCase(userInput.trim())) {
                 System.out.println("\nБот: До встречи! Хороших дорог и полного бака 🚗💨");
                 break;
             }

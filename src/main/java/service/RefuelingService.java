@@ -1,10 +1,16 @@
 package service;
 
+import model.Car;
 import model.FuelStats;
 import model.Refueling;
 import repository.RefuelingRepository;
-import java.util.*;
+
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+
 public class RefuelingService {
 
     private final RefuelingRepository repository;
@@ -13,45 +19,44 @@ public class RefuelingService {
         this.repository = repository;
     }
 
-    public void addRefueling(Refueling refueling){
-        if(refueling!=null){
+    public void addRefueling(Refueling refueling) {
+        if (refueling != null) {
             repository.save(refueling);
         }
     }
+
     // Возвращает все чеки по id машины для того чтобы высчитать статистику
-    public List<Refueling> getAllRefuelingsByCarId(UUID carId){
-        List<Refueling> carRecords = new ArrayList<>();
-        for(Refueling r : repository.findAll()){
-            if(r.getCarId() == carId){
-                carRecords.add(r);
-            }
-        }
+    public List<Refueling> getAllRefuelingsByCarId(UUID carId) {
+        List<Refueling> carRecords = repository.findByCarID(carId);
+        carRecords.sort(Comparator.comparingInt(Refueling::getMileage));
         return carRecords;
     }
-//    общая сумма всех заправок на одной машине
-    public double calculateTotalCost(UUID carId){
+
+    //    общая сумма всех заправок на одной машине
+    public double calculateTotalCost(UUID carId) {
         double total = 0.0;
-        for(Refueling refueling : getAllRefuelingsByCarId(carId)){
-            total+=refueling.getTotalCost();
+        for (Refueling refueling : getAllRefuelingsByCarId(carId)) {
+            total += refueling.getTotalCost();
         }
         return total;
     }
+
     //Расчет расхода (л/100км) за все время
-    public double calculateAverageConsumption(UUID carId){
+    public double calculateAverageConsumption(UUID carId) {
         List<Refueling> records = getAllRefuelingsByCarId(carId);//чеки
         if (records.size() < 2)
             return 0.0;
         int firstFullIndex = -1;
         int lastFullIndex = -1;
-        for(int i=0; i<records.size(); i++){
-            if(records.get(i).isFullTank()){
+        for (int i = 0; i < records.size(); i++) {
+            if (records.get(i).isFullTank()) {
                 firstFullIndex = i;
                 break;
             }
         }
-        if(firstFullIndex != -1){
-            for(int i=records.size()-1; i>=0; i--){
-                if(records.get(i).isFullTank()){
+        if (firstFullIndex != -1) {
+            for (int i = records.size() - 1; i >= 0; i--) {
+                if (records.get(i).isFullTank()) {
                     lastFullIndex = i;
                     break;
                 }
@@ -62,76 +67,89 @@ public class RefuelingService {
             return 0.0;
         }
         int totalDistance = records.get(lastFullIndex).getMileage() - records.get(firstFullIndex).getMileage();
-        if(totalDistance <= 0){return 0.0;}
+        if (totalDistance <= 0) {
+            return 0.0;
+        }
 
 
         double totalLiters = 0.0;
-        for(int i=firstFullIndex+1; i<=lastFullIndex;i++){
-            totalLiters+=records.get(i).getLiters();
+        for (int i = firstFullIndex + 1; i <= lastFullIndex; i++) {
+            totalLiters += records.get(i).getLiters();
         }
-        return (totalLiters/totalDistance)*100;
+        return (totalLiters / totalDistance) * 100;
     }
+
     //Расчет расхода за последние две заправки
-    public double calculateLastIntervalConsumption(UUID carId){
+    public double calculateLastIntervalConsumption(UUID carId) {
         List<Refueling> records = getAllRefuelingsByCarId(carId);
-        if (records.size()<2){
+        if (records.size() < 2) {
             return 0.0;
         }
-        Refueling last = records.get(records.size()-1);
-        if(!last.isFullTank()){
-            return  0.0;
+        Refueling last = records.get(records.size() - 1);
+        if (!last.isFullTank()) {
+            return 0.0;
         }
         Refueling prevFull = null;
         double accumulatedLiters = last.getLiters();
-        for(int i=records.size() -2; i>=0; i--){
+        for (int i = records.size() - 2; i >= 0; i--) {
             Refueling current = records.get(i);
-            if (current.isFullTank()){
+            if (current.isFullTank()) {
                 prevFull = current;
                 break;
             } else {
                 accumulatedLiters += current.getLiters();
             }
         }
-        if (prevFull==null){
+        if (prevFull == null) {
             return 0.0;
         }
         int distance = last.getMileage() - prevFull.getMileage();
-        if(distance<=0){
+        if (distance <= 0) {
             return 0.0;
         }
-        return (accumulatedLiters/distance) * 100;
+        return (accumulatedLiters / distance) * 100;
     }
+
     //Расчет сколько стоит один километр
-    public double calculateLastIntervalCostPerKm(UUID carId){
+    public double calculateLastIntervalCostPerKm(UUID carId) {
         List<Refueling> records = getAllRefuelingsByCarId(carId);
-        if(records.size()<2){
+        if (records.size() < 2) {
             return 0.0;
         }
-        Refueling last = records.get(records.size()-1);
-        if(!last.isFullTank()){return 0.0;}
+        Refueling last = records.get(records.size() - 1);
+        if (!last.isFullTank()) {
+            return 0.0;
+        }
         Refueling prevFull = null;
-        double accumulatedCost= last.getTotalCost();
-        for(int i=records.size()-2; i>=0;i--){
+        double accumulatedCost = last.getTotalCost();
+        for (int i = records.size() - 2; i >= 0; i--) {
             Refueling current = records.get(i);
-            if(current.isFullTank()){
+            if (current.isFullTank()) {
                 prevFull = current;
                 break;
             } else {
                 accumulatedCost += current.getTotalCost();
             }
         }
-        if(prevFull == null){
+        if (prevFull == null) {
             return 0.0;
         }
-        int distance = last.getMileage()-prevFull.getMileage();
-        if(distance<=0){
+        int distance = last.getMileage() - prevFull.getMileage();
+        if (distance <= 0) {
             return 0.0;
         }
         return accumulatedCost / distance;
     }
-    public FuelStats calculateFuelStats(UUID carId){
+
+    public FuelStats calculateFuelStats(Car car) {
+        if(car == null){
+            return null;
+        }
+        UUID carId = car.getId();
         List<Refueling> records = getAllRefuelingsByCarId(carId);
-        if(records.isEmpty()){return null;}
+        if (records.isEmpty()) {
+            return null;
+        }
         FuelStats stats = new FuelStats();
         stats.totalRefuelings = records.size();
 
@@ -207,6 +225,7 @@ public class RefuelingService {
         //Эффективность (км на 1 литр)
         if (stats.avgConsumption > 0) {
             stats.avgKmPerLiter = 100.0 / stats.avgConsumption;
+            stats.estimatedFullTankRange = (car.getTankCapacity()/stats.avgConsumption) * 100.0;
         }
         if (stats.lastConsumption > 0) {
             stats.lastKmPerLiter = 100.0 / stats.lastConsumption;

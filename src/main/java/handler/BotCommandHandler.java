@@ -1,12 +1,11 @@
 package handler;
 
 import model.Car;
-import model.Refueling;
 import model.FuelStats;
+import model.Refueling;
 import service.CarService;
 import service.RefuelingService;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,27 +32,23 @@ public class BotCommandHandler {
         }
         String message = input.trim();
         if ("/cancel".equalsIgnoreCase(message)) {
-            if (carAddHandler != null && carAddHandler.isActive()) {
                 carAddHandler.reset();
-            }
-            if (refuelingAddHandler != null && refuelingAddHandler.isActive()) {
                 refuelingAddHandler.reset();
-            }
-
             return "❌ Действие отменено.";
         }
-        //Вот тут будет проврека вводится ли данные новго автомобиля(леша ты тут пишешь)
+        //Вот тут будет проврека вводится ли данные новго автомобиля
         if (carAddHandler != null && carAddHandler.isActive()) {
             return carAddHandler.handle(message);
         }
         //Это проверка на идет ли заправка
-        if(refuelingAddHandler.isActive()){
+        if (refuelingAddHandler.isActive()) {
             return refuelingAddHandler.handle(message);
         }
         return processCommand(message);
     }
 
     private String handleStart() {
+        ensureActiveCar();
         if (activeCar != null) {
             return "👋 С возвращением в AutoKaif!\n\n" +
                     "🚗 Активный автомобиль: " + activeCar.getBrand() + " " + activeCar.getModel() +
@@ -71,13 +66,15 @@ public class BotCommandHandler {
     }
 
     private String buildGarageMessage() {
+        ensureActiveCar();
         List<Car> cars = carService.getAllCars();
         if (cars.isEmpty()) {
             return "Гараж пуст. Добавьте автомобиль командой /addcar.";
         }
         StringBuilder sb = new StringBuilder("🚗 Ваш автопарк:\n");
+        int index = 1;
         for (Car car : cars) {
-            sb.append("• [ID: ").append(car.getId()).append("] ")
+            sb.append("• [ID ").append(index++).append(" UUID: ").append(car.getId()).append("] ")
                     .append(car.getBrand()).append(" ").append(car.getModel())
                     .append(" (").append(car.getCurrentMileage()).append(" км)");
 
@@ -91,28 +88,44 @@ public class BotCommandHandler {
     }
 
     private String handleSelectCar(String[] tokens) {
+        List<Car> cars = carService.getAllCars();
+        if(cars.isEmpty()){
+            return "Гараж пуст. Сначала добавьте автомобиль через /addcar.";
+        }
         if (tokens.length < 2) {
             return "⚠️ Укажите ID автомобиля. Например: /select 1\nСписок автомобилей: /garage";
         }
-        try {
-            UUID selectedId = UUID.fromString(tokens[1]);
-            List<Car> cars = carService.getAllCars();
-            for (Car car : cars) {
-                if (car.getId() == selectedId) {
+        String arg = tokens[1].trim();
+        try{
+            int index = Integer.parseInt(arg);
+            if(index<1 || index > cars.size()){
+                return "❌ Автомобиля под номером " + index + " нет в гараже (всего машин: " + cars.size() + ").\nПроверьте список: /garage";
+            }
+            this.activeCar = cars.get(index-1);
+            return "✅ Активным автомобилем выбран: " + activeCar.getBrand() + " " + activeCar.getModel() + "!";
+        } catch (NumberFormatException ignored){
+
+        }
+        try{
+            UUID selectedId = UUID.fromString(arg);
+            for(Car car:cars){
+                if(car.getId().equals(selectedId)){
                     this.activeCar = car;
                     return "✅ Активным автомобилем выбран: " + car.getBrand() + " " + car.getModel() + "!";
                 }
             }
-            return "❌ Автомобиль с ID " + selectedId + " не найден в гараже. Проверьте список через /garage.";
-        } catch (IllegalArgumentException e) {
-            return "⚠️ Некорректный ID. Введите число. Пример: /select 1";
+            return "❌ Автомобиль с таким ID не найден.";
+        } catch (IllegalArgumentException e){
+            return "⚠️ Некорректный номер. Введите цифру из списка /garage. Пример: /select 1";
         }
     }
+
     private String buildStatsMessage() {
+        ensureActiveCar();
         if (activeCar == null) {
             return "Гараж пуст. Сначала зарегистрируйте автомобиль через /addcar";
         }
-        FuelStats stats = refuelingService.calculateFuelStats(activeCar.getId());
+        FuelStats stats = refuelingService.calculateFuelStats(activeCar);
         if (stats == null) {
             return "📊 История заправок для [" + activeCar.getBrand() + " " + activeCar.getModel() + "] пока пуста.\n" +
                     "Добавьте первый чек через команду /refuel.";
@@ -149,6 +162,7 @@ public class BotCommandHandler {
     }
 
     private String buildHistoryMessage() {
+        ensureActiveCar();
         if (activeCar == null) {
             return "Гараж пуст. Сначала зарегистрируйте автомобиль через /addcar";
         }
@@ -162,14 +176,13 @@ public class BotCommandHandler {
         }
         return sb.toString();
     }
-    private void syncActiveCar(){
-        List<Car> cars = carService.getAllCars();
-        if(!cars.isEmpty() && activeCar == null){
-            this.activeCar = cars.get(cars.size()-1);
-        } else if(!cars.isEmpty() && activeCar!=null){
-            this.activeCar = cars.get(cars.size()-1);
+
+    private void ensureActiveCar(){
+        if(this.activeCar == null && carService.hasCar()){
+            this.activeCar = carService.getCar();
         }
     }
+
     private String processCommand(String command) {
         String[] tokens = command.split("\\s+");
         String mainCommand = tokens[0].toLowerCase();
@@ -193,15 +206,17 @@ public class BotCommandHandler {
             case "/select":
                 return handleSelectCar(tokens);
             case "/car":
-                syncActiveCar();
+                ensureActiveCar();
                 if (activeCar == null) {
                     return "Гараж пуст. Добавьте машину через /addcar.";
                 }
-                return "Текущий активный профиль:\n" + activeCar.toString();
+                return "Текущий активный профиль:\n" + activeCar;
             case "/refuel":
-                syncActiveCar();
-                if(activeCar==null){return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
-                        "Сначала добавьте машину командой /addcar.";}
+                ensureActiveCar();
+                if (activeCar == null) {
+                    return "⚠️ Нельзя добавить заправку: в гараже нет автомобилей!\n" +
+                            "Сначала добавьте машину командой /addcar.";
+                }
                 return refuelingAddHandler.start(activeCar);
             case "/stats":
                 return buildStatsMessage();
