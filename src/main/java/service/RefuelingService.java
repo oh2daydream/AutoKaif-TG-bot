@@ -230,7 +230,8 @@ public class RefuelingService {
         if (stats.lastConsumption > 0) {
             stats.lastKmPerLiter = 100.0 / stats.lastConsumption;
         }
-
+        stats.lastCostPerKm = calculateLastIntervalCostPerKm(car.getId());
+        stats.avgCostPerKm = stats.avgConsumption/100.0 * stats.avgPricePerLiter;
         return stats;
     }
 

@@ -152,6 +152,8 @@ public class BotCommandHandler {
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         if (stats.avgConsumption > 0) {
             sb.append(String.format("⭐️ Средний расход: %.2f л/100 км (%.2f км/л)\n", stats.avgConsumption, stats.avgKmPerLiter));
+            sb.append(String.format("₽ Стоимость километра (последней заправки): %2f руб/км\n", stats.lastCostPerKm));
+            sb.append(String.format("₽ Стоимость километра (за все время): %2f руб/км\n", stats.avgCostPerKm));
         } else {
             sb.append("ℹ️ Средний расход: требуется от 2 заправок «до полного бака».\n");
         }
