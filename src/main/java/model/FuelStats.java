@@ -33,6 +33,7 @@ public class FuelStats {
     // 7. Пробег на баке (км между заправками)
     public double avgDistance;
     public int lastDistance;
+    public double estimatedFullTankRange;
 
     // 8. Объём топлива (л)
     public double totalLiters;
@@ -43,4 +44,6 @@ public class FuelStats {
     public double totalCost;
     public double avgCost;
     public double lastCost;
+    public double lastCostPerKm;
+    public double avgCostPerKm;
 }
