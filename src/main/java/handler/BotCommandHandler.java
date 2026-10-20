@@ -36,7 +36,6 @@ public class BotCommandHandler {
                 refuelingAddHandler.reset();
             return "❌ Действие отменено.";
         }
-        //Вот тут будет проврека вводится ли данные новго автомобиля
         if (carAddHandler != null && carAddHandler.isActive()) {
             return carAddHandler.handle(message);
         }
@@ -184,6 +183,9 @@ public class BotCommandHandler {
             this.activeCar = carService.getCar();
         }
     }
+    public boolean isDialogActive(){
+        return (carAddHandler!=null && carAddHandler.isActive()) || (refuelingAddHandler!=null && refuelingAddHandler.isActive());
+    }
 
     private String processCommand(String command) {
         String[] tokens = command.split("\\s+");
@@ -227,5 +229,10 @@ public class BotCommandHandler {
             default:
                 return "❓ Неизвестная команда. Введите /help для просмотра списка доступных действий.";
         }
+    }
+
+    public Car getActiveCar() {
+        ensureActiveCar();
+        return activeCar;
     }
 }
