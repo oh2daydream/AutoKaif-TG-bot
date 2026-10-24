@@ -4,14 +4,16 @@ import java.util.UUID;
 
 public class Car {
     private UUID id;
+    private final long userId;
     private final String brand;
     private final String model;
     private final int year;
     private final double tankCapacity;
     private int currentMileage;
 
-    public Car(UUID id, String brand, String model, int year, double tankCapacity, int currentMileage) {
+    public Car(UUID id,long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
         this.id = id;
+        this.userId =  userId;
         this.brand = brand;
         this.model = model;
         this.year = year;
@@ -19,14 +21,16 @@ public class Car {
         this.currentMileage = currentMileage;
     }
 
-    public Car(String brand, String model, int year, double tankCapacity, int currentMileage) {
-        this(null, brand, model, year, tankCapacity, currentMileage);
+    public Car(String brand,long userId, String model, int year, double tankCapacity, int currentMileage) {
+        this(null,userId, brand, model, year, tankCapacity, currentMileage);
     }
 
     //геттеры-----------------------------------------------------------------
     public UUID getId() {
         return id;
     }
+
+    public long getUserId(){return userId;}
 
     public String getBrand() {
         return brand;

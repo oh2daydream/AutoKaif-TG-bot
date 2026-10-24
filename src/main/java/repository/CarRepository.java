@@ -13,4 +13,6 @@ public interface CarRepository {
     Car findById(UUID id);
 
     List<Car> findAll();
+
+    List<Car> findByUserId(long userId);
 }

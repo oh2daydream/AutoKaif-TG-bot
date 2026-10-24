@@ -6,73 +6,97 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
-public class TelegramBot extends TelegramLongPollingBot{
+public class TelegramBot extends TelegramLongPollingBot {
     private final String botUsername;
     private final BotCommandHandler botHandler;
 
-    public TelegramBot(String botToken, String botUsername, BotCommandHandler botHandler){
+    public TelegramBot(String botToken, String botUsername, BotCommandHandler botHandler) {
         super(botToken);
         this.botUsername = botUsername;
         this.botHandler = botHandler;
     }
+
     @Override
-    public String getBotUsername(){
+    public String getBotUsername() {
         return botUsername;
     }
+
     @Override
-    public void onUpdateReceived(Update update){
+    public void onUpdateReceived(Update update) {
         long chatId;
+        long userId;
         String userInput;
 
-        if(update.hasCallbackQuery()){
+        // 1. Пользователь нажал Inline-кнопку под сообщением
+        if (update.hasCallbackQuery()) {
             chatId = update.getCallbackQuery().getMessage().getChatId();
+            // Извлекаем пользователя из CallbackQuery, чтобы избежать NullPointerException
+            userId = update.getCallbackQuery().getFrom().getId();
             userInput = update.getCallbackQuery().getData();
-            String callbackId= update.getCallbackQuery().getId();
+
+            // Снимаем анимацию ожидания («часики») с кнопки
+            answerCallBack(update.getCallbackQuery().getId());
         }
-        else if(update.hasMessage() && update.getMessage().hasText()){
+        // 2. Пользователь отправил текстовое сообщение или нажал кнопку нижнего меню
+        else if (update.hasMessage() && update.getMessage().hasText()) {
             chatId = update.getMessage().getChatId();
+            userId = update.getMessage().getFrom().getId();
             userInput = update.getMessage().getText();
-        } else {
+        }
+        // 3. Другие типы апдейтов (стикеры, фото, системные уведомления) игнорируем
+        else {
             return;
         }
 
-        String responseText = botHandler.handleMessage(userInput);
+        // Передаем команду и идентификатор пользователя в диспетчер
+        String responseText = botHandler.handleMessage(userId, userInput);
 
-        sendResponse(chatId, userInput.trim(), responseText);
+        // Отправляем ответ с нужной раскладкой кнопок
+        sendResponse(chatId, userId, userInput.trim(), responseText);
     }
 
-    private void sendResponse(long chatId, String command, String text){
+    private void sendResponse(long chatId, long userId, String command, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
 
-        if(botHandler.isDialogActive()){
+        // Контекстное отображение клавиатур
+        if ("/garage".equalsIgnoreCase(command)) {
+            List<Car> cars = botHandler.getUserCars(userId);
+            if (!cars.isEmpty()) {
+                message.setReplyMarkup(KeyboardFactory.getGarageInlineKeyboard(cars, botHandler.getActiveCar(userId)));
+            } else {
+                message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
+            }
+        }
+        else if (botHandler.isDialogActive(userId)) {
             message.setReplyMarkup(KeyboardFactory.getCancelKeyboard());
         }
-        else if(botHandler.getActiveCar()==null){
-            message.setReplyMarkup(KeyboardFactory.getStartMenuKeyboard());
-            KeyboardFactory.removeKeyboard();
+        else if (botHandler.getActiveCar(userId) == null) {
+            message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
         }
         else {
             message.setReplyMarkup(KeyboardFactory.getMainMenuKeyboard());
         }
-        try{
+
+        try {
             execute(message);
-        } catch (TelegramApiException e){
+        } catch (TelegramApiException e) {
             System.err.println("❌ Ошибка отправки сообщения в Telegram: " + e.getMessage());
         }
     }
-    private void answerCallBack(String callBackId){
+
+    private void answerCallBack(String callBackId) {
         AnswerCallbackQuery answer = new AnswerCallbackQuery();
         answer.setCallbackQueryId(callBackId);
-        try{
+        try {
             execute(answer);
-        } catch (TelegramApiException ignored){}
-
+        } catch (TelegramApiException ignored) {
+            // Игнорируем ошибку, если пользователь нажал кнопку несколько раз подряд
+        }
     }
 }

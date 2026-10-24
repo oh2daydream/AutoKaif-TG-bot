@@ -7,6 +7,7 @@ import java.time.Year;
 
 public class CarAddHandler {
     private final CarService carService;
+    private final long userId;
     private boolean active = false;
     private int step = 0;
 
@@ -17,8 +18,9 @@ public class CarAddHandler {
     private double tankCapacity;
     private int currentMileage;
 
-    public CarAddHandler(CarService carService) {
+    public CarAddHandler(CarService carService, long userId) {
         this.carService = carService;
+        this.userId=userId;
     }
 
     public boolean isActive() {
@@ -98,7 +100,7 @@ public class CarAddHandler {
                     this.currentMileage = inputMileage;
 
                     // Все данные собраны — создаем и сохраняем машину
-                    Car newCar = carService.registerCar(brand, model, year, tankCapacity, currentMileage);
+                    Car newCar = carService.registerCar(brand,userId , model, year, tankCapacity, currentMileage);
                     reset();
 
                     return "✅ Автомобиль успешно добавлен в гараж!\n\n" + newCar.toString();
