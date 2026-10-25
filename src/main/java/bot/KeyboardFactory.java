@@ -104,12 +104,13 @@ public class KeyboardFactory {
     }
     public static InlineKeyboardMarkup getCancelKeyboard(){
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-
         List<List<InlineKeyboardButton>> button = new ArrayList<>();
+
         List<InlineKeyboardButton> row = new ArrayList<>();
         InlineKeyboardButton btn = new InlineKeyboardButton();
         btn.setText("Отмена");
         btn.setCallbackData("/cancel");
+        row.add(btn);
         button.add(row);
 
         keyboardMarkup.setKeyboard(button);
