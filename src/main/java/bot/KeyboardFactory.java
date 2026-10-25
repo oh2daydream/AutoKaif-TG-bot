@@ -1,6 +1,7 @@
 package bot;
 
 import model.Car;
+import org.glassfish.jersey.message.internal.InboundMessageContext;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -34,23 +35,19 @@ public class KeyboardFactory {
         return markup;
     }
     // Меню для пользователя с пустым гаражом
-    public static ReplyKeyboardMarkup getEmptyGarageKeyboard() {
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true); // Подгоняет размер кнопок под экран
-        keyboardMarkup.setOneTimeKeyboard(false);
-
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-
-        // Добавляем только две актуальные команды
-        row.add(new KeyboardButton("/addcar"));
-        row.add(new KeyboardButton("/help"));
-
-        keyboard.add(row);
-        keyboardMarkup.setKeyboard(keyboard);
+    public static InlineKeyboardMarkup getEmptyGarageKeyboard() {
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton btn1 = new InlineKeyboardButton();
+        btn1.setText("Добавить машину");
+        btn1.setCallbackData("/addcar");
+        row1.add(btn1);
+        buttons.add(row1);
+        keyboardMarkup.setKeyboard(buttons);
         return keyboardMarkup;
     }
-    public static ReplyKeyboardMarkup getStartMenuKeyboard(){
+    public static ReplyKeyboardMarkup getStartMenuInlineButtons(){
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(false);
@@ -65,44 +62,57 @@ public class KeyboardFactory {
         keyboardMarkup.setKeyboard(keyboard);
         return keyboardMarkup;
     }
-    public static ReplyKeyboardMarkup getMainMenuKeyboard(){
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(false);
+    public static InlineKeyboardMarkup getMainMenuInLineKeyboard(){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
-        List<KeyboardRow> keyboard = new ArrayList<>();
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        InlineKeyboardButton btn1 = new InlineKeyboardButton();
+        btn1.setText("⛽ Добавить заправку");
+        btn1.setCallbackData("/refuel");
+        row1.add(btn1);
 
-        KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton("/refuel"));
-        row1.add(new KeyboardButton("/stats"));
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        InlineKeyboardButton btn2 = new InlineKeyboardButton();
+        btn2.setText("Машина");
+        btn2.setCallbackData("/car");
+        row2.add(btn2);
 
-        KeyboardRow row2 = new KeyboardRow();
-        row2.add(new KeyboardButton("/garage"));
-        row2.add(new KeyboardButton("/car"));
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        InlineKeyboardButton btn3 = new InlineKeyboardButton();
+        btn3.setText("Гараж");
+        btn3.setCallbackData("/garage");
+        row3.add(btn3);
 
-        KeyboardRow row3 = new KeyboardRow();
-        row3.add(new KeyboardButton("/addcar"));
-        row3.add(new KeyboardButton("/history"));
-        row3.add(new KeyboardButton("/help"));
+        List<InlineKeyboardButton> row4 = new ArrayList<>();
+        InlineKeyboardButton btn4 = new InlineKeyboardButton();
+        btn4.setText("Статистика заправок");
+        btn4.setCallbackData("/stats");
+        InlineKeyboardButton btn5 = new InlineKeyboardButton();
+        btn5.setText("История заправок");
+        btn5.setCallbackData("/history");
+        row4.add(btn4);
+        row4.add(btn5);
 
-        keyboard.add(row1);
-        keyboard.add(row2);
-        keyboard.add(row3);
+        buttons.add(row1);
+        buttons.add(row2);
+        buttons.add(row3);
+        buttons.add(row4);
 
-        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setKeyboard(buttons);
         return keyboardMarkup;
     }
-    public static ReplyKeyboardMarkup getCancelKeyboard(){
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(false);
+    public static InlineKeyboardMarkup getCancelKeyboard(){
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
 
-        List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("/cancel"));
-        keyboard.add(row);
+        List<List<InlineKeyboardButton>> button = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        InlineKeyboardButton btn = new InlineKeyboardButton();
+        btn.setText("Отмена");
+        btn.setCallbackData("/cancel");
+        button.add(row);
 
-        keyboardMarkup.setKeyboard(keyboard);
+        keyboardMarkup.setKeyboard(button);
         return keyboardMarkup;
     }
     public static ReplyKeyboardRemove removeKeyboard(){

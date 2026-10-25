@@ -25,8 +25,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
     private void registerBotCommands(){
         BotCommand command = new BotCommand("/start", "Главное меню");
+        BotCommand command1 = new BotCommand("/help", "Помощь. Список Доступных команд");
         try{
-            execute(new SetMyCommands(List.of(command), new BotCommandScopeDefault(),null));
+            execute(new SetMyCommands(List.of(command, command1), new BotCommandScopeDefault(),null));
         } catch (TelegramApiException e){
             System.err.println("⚠️ Не удалось настроить меню команд: " + e.getMessage());
         }
@@ -69,7 +70,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
 
-        if ("/garage".equalsIgnoreCase(command)) {
+        if(botHandler. isDialogActive(userId)){
+            message.setReplyMarkup(KeyboardFactory.getCancelKeyboard());
+        }
+        else if(botHandler.getActiveCar(userId)==null){
+            message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
+        }
+        else if ("/garage".equalsIgnoreCase(command)) {
             List<Car> cars = botHandler.getUserCars(userId);
             if (!cars.isEmpty()) {
                 message.setReplyMarkup(KeyboardFactory.getGarageInlineKeyboard(cars, botHandler.getActiveCar(userId)));
@@ -77,16 +84,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
             }
         }
-        else if (botHandler.isDialogActive(userId)) {
-            message.setReplyMarkup(KeyboardFactory.getCancelKeyboard());
-        }
-        else if (botHandler.getActiveCar(userId) == null) {
-            message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
-        }
         else {
-            message.setReplyMarkup(KeyboardFactory.getMainMenuKeyboard());
+            message.setReplyMarkup(KeyboardFactory.getMainMenuInLineKeyboard());
         }
-
         try {
             execute(message);
         } catch (TelegramApiException e) {
