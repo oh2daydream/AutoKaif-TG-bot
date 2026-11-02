@@ -16,7 +16,12 @@ public class KeyboardFactory {
     public static InlineKeyboardMarkup getGarageInlineKeyboard(List<Car> cars, Car activeCar){
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
+        InlineKeyboardButton button_addCar = new InlineKeyboardButton();
+        button_addCar.setText("Добавить машину");
+        button_addCar.setCallbackData("/addcar");
+        List<InlineKeyboardButton> row0 = new ArrayList<>();
+        row0.add(button_addCar);
+        rows.add(row0);
         for(int i = 0; i < cars.size();i++){
             Car car = cars.get(i);
             InlineKeyboardButton button = new InlineKeyboardButton();
