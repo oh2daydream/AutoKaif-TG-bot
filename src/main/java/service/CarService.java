@@ -27,9 +27,6 @@ public class CarService {
         return carRepository.findByUserId(userId);
     }
     //геттер-------------------
-    public Car getCar() {
-        return carRepository.getCar();
-    }
 
     public List<Car> getAllCars() {
         return carRepository.findAll();

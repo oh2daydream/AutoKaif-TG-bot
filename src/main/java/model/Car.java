@@ -1,15 +1,28 @@
 package model;
 
+import jakarta.persistence.*;
 import java.util.UUID;
-
+@Entity
+@Table(name = "cars")
 public class Car {
+    @Id
+    @Column(name = "id", nullable = false)
     private UUID id;
-    private final long userId;
-    private final String brand;
-    private final String model;
-    private final int year;
-    private final double tankCapacity;
+    @Column(name = "userId", nullable = false)
+    private long userId;
+    @Column(name = "brand", nullable = false)
+    private String brand;
+    @Column(name = "mdodel", nullable = false)
+    private String model;
+    @Column(name = "id", nullable = false)
+    private int year;
+    @Column(name = "id", nullable = false)
+    private double tankCapacity;
+    @Column(name = "id", nullable = false)
     private int currentMileage;
+
+    protected Car() {
+    }
 
     public Car(UUID id,long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
         this.id = id;

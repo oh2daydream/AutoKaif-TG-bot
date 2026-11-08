@@ -1,16 +1,29 @@
 package model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
-
+@Entity
+@Table(name = "refueling")
 public class Refueling {
+    @Id
+    @Column(name = "id")
     private UUID id;
+    @Column(name = "car_id", nullable = false)
     private UUID carId;
+    @Column(name = "mileage", nullable = false)
     private int mileage;
+    @Column(name = "liters", nullable = false)
     private double liters;
+    @Column(name = "total_cost", nullable = false)
     private double totalCost;
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+    @Column(name = "is_full_tank", nullable = false)
     private boolean isFullTank;
+
+    protected Refueling(){
+    }
 
     // Для создания нового чека в боте (генерирует новый UUID)
     public Refueling(UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
