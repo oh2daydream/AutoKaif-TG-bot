@@ -12,9 +12,12 @@ public class DatabaseConfig {
             HikariConfig config = new HikariConfig();
 
             // Читаем переменные окружения или берем дефолтные значения для туннеля
-            String dbUrl = System.getenv().getOrDefault("DB_URL", "jdbc:postgresql://localhost:5433/car_logbook");
-            String dbUser = System.getenv().getOrDefault("DB_USER", "car_user");
-            String dbPassword = System.getenv().getOrDefault("DB_PASSWORD", "Y6=7]Gfw#32F");
+            String dbUrl = System.getenv("DB_URL");
+            String dbUser = System.getenv("DB_USER");
+            String dbPassword = System.getenv("DB_PASSWORD");
+            if(dbUrl == null || dbUser == null || dbPassword == null){
+                System.err.println("Не заданы переменные окружения DB_URL, DB_USER или DB_PASSWORD");
+            }
 
             config.setJdbcUrl(dbUrl);
             config.setUsername(dbUser);
