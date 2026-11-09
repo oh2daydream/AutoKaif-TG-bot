@@ -2,11 +2,10 @@ package repository;
 
 import model.Refueling;
 
-import java.sql.Ref;
 import java.util.*;
 
 public class InMemoryRefuelingRepository implements RefuelingRepository {
-    private final Map<UUID, Refueling> storage = new HashMap<>();
+    private final Map<UUID, Refueling> storage = new LinkedHashMap<>();
 
     @Override
     public void save(Refueling refueling) {
