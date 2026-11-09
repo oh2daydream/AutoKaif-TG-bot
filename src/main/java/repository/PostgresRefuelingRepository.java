@@ -37,7 +37,7 @@ public class PostgresRefuelingRepository implements RefuelingRepository {
     @Override
     public List<Refueling> findByCarID(UUID carId) {
         return sessionFactory.fromTransaction(session -> {
-            String hql = "FROM Refueilng r WHERE r.carId = :carId ORDER BY r.mileage ASC";
+            String hql = "FROM Refueling r WHERE r.carId = :carId ORDER BY r.mileage ASC";
 
             return session.createSelectionQuery(hql, Refueling.class).setParameter("carId", carId).getResultList();
         });

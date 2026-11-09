@@ -15,11 +15,10 @@ public class HibernateUtil {
         configuration.setProperty("hibernate.connection.username", dbUser);
         configuration.setProperty("hibernate.connection.password", dbPassword);
 
-        // Полезно для отладки: Hibernate будет красиво печатать сгенерированный SQL в консоль
+        configuration.setProperty("hibernate.hbm2ddl.auto", "update");
         configuration.setProperty("hibernate.show_sql", "true");
         configuration.setProperty("hibernate.format_sql", "true");
 
-        // Регистрируем наши классы-сущности
         configuration.addAnnotatedClass(Car.class);
         configuration.addAnnotatedClass(Refueling.class);
 

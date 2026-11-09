@@ -27,7 +27,9 @@ public class PostgresCarRepository implements CarRepository {
     public List<Car> findByUserId(long userId) {
         return sessionFactory.fromTransaction(session -> {
             String hql = "FROM Car c WHERE c.userId = :userId";
-            return session.createSelectionQuery(hql, Car.class).getResultList();
+            return session.createSelectionQuery(hql, Car.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
         });
     }
 

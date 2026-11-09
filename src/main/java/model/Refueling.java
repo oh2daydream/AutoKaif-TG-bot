@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
 @Entity
-@Table(name = "refueling")
+@Table(name = "refuelings")
 public class Refueling {
     @Id
     @Column(name = "id")

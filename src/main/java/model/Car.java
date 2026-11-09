@@ -8,25 +8,25 @@ public class Car {
     @Id
     @Column(name = "id", nullable = false)
     private UUID id;
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private long userId;
     @Column(name = "brand", nullable = false)
     private String brand;
-    @Column(name = "mdodel", nullable = false)
+    @Column(name = "model", nullable = false)
     private String model;
-    @Column(name = "id", nullable = false)
+    @Column(name = "year", nullable = false)
     private int year;
-    @Column(name = "id", nullable = false)
+    @Column(name = "tank_capacity", nullable = false)
     private double tankCapacity;
-    @Column(name = "id", nullable = false)
+    @Column(name = "current_mileage", nullable = false)
     private int currentMileage;
 
     protected Car() {
     }
 
     public Car(UUID id,long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
-        this.id = id;
-        this.userId =  userId;
+        this.id = (id != null) ? id : UUID.randomUUID();
+        this.userId = userId;
         this.brand = brand;
         this.model = model;
         this.year = year;
