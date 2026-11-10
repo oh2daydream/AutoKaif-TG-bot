@@ -27,17 +27,14 @@ public class CarService {
         return carRepository.findByUserId(userId);
     }
     //геттер-------------------
-    public Car getCar() {
-        return carRepository.getCar();
-    }
 
     public List<Car> getAllCars() {
         return carRepository.findAll();
     }
 
     //проверки-------------------
-    public boolean hasCar(long userId) { //чтобы не давать заправляться или обновлять пробег, пока машина не создана
-        return carRepository.findByUserId(userId) != null;
+    public boolean hasCar(long userId) {
+        return !carRepository.findByUserId(userId).isEmpty();
     }
 
     public Car getActiveCar(long userId) {

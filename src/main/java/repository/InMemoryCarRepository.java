@@ -28,14 +28,6 @@ public class InMemoryCarRepository implements CarRepository {
     }
 
     @Override
-    public Car getCar() {
-        if (storage.isEmpty()) {
-            return null;
-        }
-        return storage.values().iterator().next();
-    }
-
-    @Override
     public Car findById(UUID id) {
         return storage.get(id);
     }
