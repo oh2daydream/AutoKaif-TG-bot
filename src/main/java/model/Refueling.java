@@ -25,12 +25,6 @@ public class Refueling {
     protected Refueling(){
     }
 
-    // Для создания нового чека в боте (генерирует новый UUID)
-    public Refueling(UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
-        this(UUID.randomUUID(), carId, mileage, liters, totalCost, date, isFullTank);
-    }
-
-    // Для восстановления чека из базы данных (принимает уже существующий UUID)
     public Refueling(UUID id, UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
         this.id = id;
         this.carId = carId;
@@ -39,6 +33,10 @@ public class Refueling {
         this.totalCost = totalCost;
         this.date = date;
         this.isFullTank = isFullTank;
+    }
+
+    public Refueling(UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
+        this(UUID.randomUUID(), carId, mileage, liters, totalCost, date, isFullTank);
     }
 
     public UUID getId() {

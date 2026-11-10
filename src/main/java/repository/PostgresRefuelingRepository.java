@@ -42,16 +42,4 @@ public class PostgresRefuelingRepository implements RefuelingRepository {
             return session.createSelectionQuery(hql, Refueling.class).setParameter("carId", carId).getResultList();
         });
     }
-
-    private Refueling mapRowToRefueling(ResultSet rs) throws SQLException {
-        return new Refueling(
-                rs.getObject("id", UUID.class),
-                rs.getObject("car_id", UUID.class),
-                rs.getInt("mileage"),
-                rs.getDouble("liters"),
-                rs.getDouble("total_cost"),
-                rs.getDate("date").toLocalDate(),
-                rs.getBoolean("is_full_tank")
-        );
-    }
 }

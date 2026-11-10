@@ -31,7 +31,6 @@ public class Main {
                 carService
         );
 
-
         Bot bot = new TelegramBotRunner(botHandler);
         bot.run();
     }
