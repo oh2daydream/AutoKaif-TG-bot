@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   autokaif-bot:
-    build: .
+    build: src/main/java
     container_name: autokaif_bot
     restart: always
     # Позволяет боту на Linux напрямую обращаться к localhost:5433 сервера
