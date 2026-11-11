@@ -1,7 +1,7 @@
 # Сборка Maven (скомпилированные .class файлы и jar-артефакты)
 target/
 !.mvn/wrapper/maven-wrapper.jar
-
+*.jar
 # Настройки IntelliJ IDEA
 .idea/
 *.iml

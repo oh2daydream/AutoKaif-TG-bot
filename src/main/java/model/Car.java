@@ -1,7 +1,12 @@
 package model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.util.UUID;
+
 @Entity
 @Table(name = "cars")
 public class Car {
@@ -24,7 +29,7 @@ public class Car {
     protected Car() {
     }
 
-    public Car(UUID id,long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
+    public Car(UUID id, long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
         this.id = (id != null) ? id : UUID.randomUUID();
         this.userId = userId;
         this.brand = brand;
@@ -34,8 +39,8 @@ public class Car {
         this.currentMileage = currentMileage;
     }
 
-    public Car(String brand,long userId, String model, int year, double tankCapacity, int currentMileage) {
-        this(null,userId, brand, model, year, tankCapacity, currentMileage);
+    public Car(String brand, long userId, String model, int year, double tankCapacity, int currentMileage) {
+        this(null, userId, brand, model, year, tankCapacity, currentMileage);
     }
 
     //геттеры-----------------------------------------------------------------
@@ -43,7 +48,14 @@ public class Car {
         return id;
     }
 
-    public long getUserId(){return userId;}
+    //сеттер-----------------------------------------------------------------
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
 
     public String getBrand() {
         return brand;
@@ -63,11 +75,6 @@ public class Car {
 
     public int getCurrentMileage() {
         return currentMileage;
-    }
-
-    //сеттер-----------------------------------------------------------------
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     //методы-----------------------------------------------------------------

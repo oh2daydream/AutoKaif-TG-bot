@@ -23,12 +23,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.botHandler = botHandler;
         registerBotCommands();
     }
-    private void registerBotCommands(){
+
+    private void registerBotCommands() {
         BotCommand command = new BotCommand("/start", "Главное меню");
         BotCommand command1 = new BotCommand("/help", "Помощь. Список Доступных команд");
-        try{
-            execute(new SetMyCommands(List.of(command, command1), new BotCommandScopeDefault(),null));
-        } catch (TelegramApiException e){
+        try {
+            execute(new SetMyCommands(List.of(command, command1), new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
             System.err.println("⚠️ Не удалось настроить меню команд: " + e.getMessage());
         }
     }
@@ -50,13 +51,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             userInput = update.getCallbackQuery().getData();
 
             answerCallBack(update.getCallbackQuery().getId());
-        }
-        else if (update.hasMessage() && update.getMessage().hasText()) {
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
             chatId = update.getMessage().getChatId();
             userId = update.getMessage().getFrom().getId();
             userInput = update.getMessage().getText();
-        }
-        else {
+        } else {
             return;
         }
 
@@ -70,22 +69,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
 
-        if(botHandler. isDialogActive(userId)){
+        if (botHandler.isDialogActive(userId)) {
             message.setReplyMarkup(KeyboardFactory.getCancelKeyboard());
-        }
-        else if(botHandler.getActiveCar(userId)==null){
+        } else if (botHandler.getActiveCar(userId) == null) {
             message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
-        }
-        else if ("/garage".equalsIgnoreCase(command)) {
+        } else if ("/garage".equalsIgnoreCase(command)) {
             List<Car> cars = botHandler.getUserCars(userId);
             if (!cars.isEmpty()) {
                 message.setReplyMarkup(KeyboardFactory.getGarageInlineKeyboard(cars, botHandler.getActiveCar(userId)));
             } else {
                 message.setReplyMarkup(KeyboardFactory.getEmptyGarageKeyboard());
             }
-        }
-        else {
-            message.setReplyMarkup(KeyboardFactory.getMainMenuInLineKeyboard());
+        } else {
+            message.setReplyMarkup(KeyboardFactory.getMainMenuKeyboard());
         }
         try {
             execute(message);

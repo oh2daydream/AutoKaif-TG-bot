@@ -20,7 +20,7 @@ public class CarAddHandler {
 
     public CarAddHandler(CarService carService, long userId) {
         this.carService = carService;
-        this.userId=userId;
+        this.userId = userId;
     }
 
     public boolean isActive() {
@@ -100,7 +100,7 @@ public class CarAddHandler {
                     this.currentMileage = inputMileage;
 
                     // Все данные собраны — создаем и сохраняем машину
-                    Car newCar = carService.registerCar(brand,userId , model, year, tankCapacity, currentMileage);
+                    Car newCar = carService.registerCar(brand, userId, model, year, tankCapacity, currentMileage);
                     reset();
 
                     return "✅ Автомобиль успешно добавлен в гараж!\n\n" + newCar.toString();

@@ -1,12 +1,10 @@
 package repository;
 
 import model.Refueling;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class PostgresRefuelingRepository implements RefuelingRepository {
     private final SessionFactory sessionFactory;
@@ -17,19 +15,21 @@ public class PostgresRefuelingRepository implements RefuelingRepository {
 
     @Override
     public void save(Refueling refueling) {
-        sessionFactory.inTransaction(session -> {session.merge(refueling);});
+        sessionFactory.inTransaction(session -> {
+            session.merge(refueling);
+        });
     }
 
     @Override
     public Refueling findById(UUID id) {
         return sessionFactory.fromTransaction(session -> {
-            return session.get(Refueling.class,id);
+            return session.get(Refueling.class, id);
         });
     }
 
     @Override
     public List<Refueling> findAll() {
-        return  sessionFactory.fromTransaction(session -> {
+        return sessionFactory.fromTransaction(session -> {
             return session.createSelectionQuery("FROM Refueling", Refueling.class).getResultList();
         });
     }

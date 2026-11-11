@@ -6,7 +6,6 @@ import model.Refueling;
 import repository.RefuelingRepository;
 
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -142,7 +141,7 @@ public class RefuelingService {
     }
 
     public FuelStats calculateFuelStats(Car car) {
-        if(car == null){
+        if (car == null) {
             return null;
         }
         UUID carId = car.getId();
@@ -225,13 +224,13 @@ public class RefuelingService {
         //Эффективность (км на 1 литр)
         if (stats.avgConsumption > 0) {
             stats.avgKmPerLiter = 100.0 / stats.avgConsumption;
-            stats.estimatedFullTankRange = (car.getTankCapacity()/stats.avgConsumption) * 100.0;
+            stats.estimatedFullTankRange = (car.getTankCapacity() / stats.avgConsumption) * 100.0;
         }
         if (stats.lastConsumption > 0) {
             stats.lastKmPerLiter = 100.0 / stats.lastConsumption;
         }
         stats.lastCostPerKm = calculateLastIntervalCostPerKm(car.getId());
-        stats.avgCostPerKm = stats.avgConsumption/100.0 * stats.avgPricePerLiter;
+        stats.avgCostPerKm = stats.avgConsumption / 100.0 * stats.avgPricePerLiter;
         return stats;
     }
 

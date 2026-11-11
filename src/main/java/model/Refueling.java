@@ -1,8 +1,13 @@
 package model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 import java.util.UUID;
+
 @Entity
 @Table(name = "refuelings")
 public class Refueling {
@@ -22,7 +27,7 @@ public class Refueling {
     @Column(name = "is_full_tank", nullable = false)
     private boolean isFullTank;
 
-    protected Refueling(){
+    protected Refueling() {
     }
 
     public Refueling(UUID id, UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
@@ -42,21 +47,27 @@ public class Refueling {
     public UUID getId() {
         return id;
     }
+
     public UUID getCarId() {
         return carId;
     }
+
     public int getMileage() {
         return mileage;
     }
+
     public double getLiters() {
         return liters;
     }
+
     public double getTotalCost() {
         return totalCost;
     }
+
     public LocalDate getDate() {
         return date;
     }
+
     public boolean isFullTank() {
         return isFullTank;
     }

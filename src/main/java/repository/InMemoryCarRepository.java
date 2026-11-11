@@ -19,8 +19,8 @@ public class InMemoryCarRepository implements CarRepository {
     @Override
     public List<Car> findByUserId(long userId) {
         List<Car> result = new ArrayList<>();
-        for(Car car : storage.values()){
-            if(car.getUserId() == userId){
+        for (Car car : storage.values()) {
+            if (car.getUserId() == userId) {
                 result.add(car);
             }
         }

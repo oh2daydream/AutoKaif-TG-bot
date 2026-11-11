@@ -3,8 +3,8 @@ package repository;
 import model.Car;
 import org.hibernate.SessionFactory;
 
-import java.sql.*;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class PostgresCarRepository implements CarRepository {
     private final SessionFactory sessionFactory;

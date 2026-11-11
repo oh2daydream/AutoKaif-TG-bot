@@ -6,7 +6,6 @@ import service.CarService;
 import service.RefuelingService;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class RefuelingAddHandler {
     private final CarService carService;
@@ -18,17 +17,17 @@ public class RefuelingAddHandler {
     private double liters;
     private boolean isFull;
 
-    public RefuelingAddHandler(RefuelingService refuelingService, CarService carService){
+    public RefuelingAddHandler(RefuelingService refuelingService, CarService carService) {
         this.refuelingService = refuelingService;
         this.carService = carService;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return active;
     }
 
-    public String start(Car activeCar){
-        if(activeCar == null){
+    public String start(Car activeCar) {
+        if (activeCar == null) {
             return "⚠️ Сначала выберите автомобиль из гаража с помощью команды /select <ID>!";
         }
         this.targetCar = activeCar;
@@ -40,7 +39,7 @@ public class RefuelingAddHandler {
                 "(Для отмены введите /cancel)";
     }
 
-    public void reset(){
+    public void reset() {
         this.active = false;
         this.step = 0;
         this.targetCar = null;
@@ -49,32 +48,32 @@ public class RefuelingAddHandler {
         this.isFull = false;
     }
 
-    public String handle(String input){
+    public String handle(String input) {
         String message = input.trim();
-        if("/cancel".equalsIgnoreCase(message)){
+        if ("/cancel".equalsIgnoreCase(message)) {
             reset();
             return "❌ Внесение заправки отменено.";
         }
 
-        switch(step){
+        switch (step) {
             case 0: // Шаг 1: Пробег
-                try{
+                try {
                     int inputMileage = Integer.parseInt(message);
-                    if(inputMileage < targetCar.getCurrentMileage()){
+                    if (inputMileage < targetCar.getCurrentMileage()) {
                         return "⚠️ Ошибка: пробег не может быть меньше текущего (" +
                                 targetCar.getCurrentMileage() + " км). Попробуйте снова:";
                     }
                     this.mileage = inputMileage;
                     this.step++;
                     return "Шаг 2 из 4: Введите количество заправленных литров (например, 42.5):";
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     return "⚠️ Пробег должен быть целым числом. Попробуйте снова:";
                 }
 
             case 1: // Шаг 2: Литры
-                try{
-                    double inputLiters = Double.parseDouble(message.replace(',','.'));
-                    if(inputLiters <= 0 || inputLiters > 500 || (targetCar.getTankCapacity() > 0 && inputLiters > targetCar.getTankCapacity()*1.1)){
+                try {
+                    double inputLiters = Double.parseDouble(message.replace(',', '.'));
+                    if (inputLiters <= 0 || inputLiters > 500 || (targetCar.getTankCapacity() > 0 && inputLiters > targetCar.getTankCapacity() * 1.1)) {
                         return "⚠️ Объём должен быть положительным числом (до 500 л) и не превышать объём бака машины. Попробуйте снова:";
                     }
                     this.liters = inputLiters;
@@ -86,11 +85,11 @@ public class RefuelingAddHandler {
 
             case 2: // Шаг 3: Полный бак (да/нет)
                 String answer = message.toLowerCase();
-                if("да".equals(answer) || "д".equals(answer)){
+                if ("да".equals(answer) || "д".equals(answer)) {
                     this.isFull = true;
                     this.step++;
                     return "Шаг 4 из 4: Введите цену за 1 литр в рублях (например, 64.80):";
-                } else if("нет".equals(answer) || "н".equals(answer)){
+                } else if ("нет".equals(answer) || "н".equals(answer)) {
                     this.isFull = false;
                     this.step++;
                     return "Шаг 4 из 4: Введите цену за 1 литр в рублях (например, 64.80):";
@@ -99,9 +98,9 @@ public class RefuelingAddHandler {
                 }
 
             case 3:
-                try{
-                    double pricePerLiter = Double.parseDouble(message.replace(',','.'));
-                    if(pricePerLiter <= 0 ){
+                try {
+                    double pricePerLiter = Double.parseDouble(message.replace(',', '.'));
+                    if (pricePerLiter <= 0) {
                         return "⚠️ Цена за литр должна быть больше 0. Попробуйте снова:";
                     }
 
@@ -131,7 +130,7 @@ public class RefuelingAddHandler {
                                     "• Итоговая сумма: %.2f ₽\n" +
                                     "• Новый пробег: %d км",
                             savedIsFull ? "Да" : "Нет", savedLiters, pricePerLiter, totalCost, savedMileage);
-                } catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     return "⚠️ Цена должна быть числом. Попробуйте снова:";
                 }
 

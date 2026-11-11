@@ -11,19 +11,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CarService {
     private final CarRepository carRepository;
 
-    private final Map<Long, UUID> userActiveCars =  new ConcurrentHashMap<>();
+    private final Map<Long, UUID> userActiveCars = new ConcurrentHashMap<>();
+
     public CarService(CarRepository carRepository) {
         this.carRepository = carRepository;
     }
 
     //методы-------------------
-    public Car registerCar(String brand,long userId, String model, int year, double tankCapacity, int currentMileage) {
+    public Car registerCar(String brand, long userId, String model, int year, double tankCapacity, int currentMileage) {
         Car car = new Car(brand, userId, model, year, tankCapacity, currentMileage);
         Car savedCar = carRepository.save(car);
         return savedCar;
     }
 
-    public List<Car> getCarsByUserId(long userId){
+    public List<Car> getCarsByUserId(long userId) {
         return carRepository.findByUserId(userId);
     }
     //геттер-------------------
@@ -51,6 +52,7 @@ public class CarService {
         }
         return null;
     }
+
     public boolean updateMileage(UUID carId, int newMileage) {
         Car car = carRepository.findById(carId);
         if (car == null) return false;
@@ -60,11 +62,13 @@ public class CarService {
         }
         return updated;
     }
-    public void setActiveCar(long userId, UUID carId){
-        if(carId!=null && carRepository.findById(carId)!=null){
+
+    public void setActiveCar(long userId, UUID carId) {
+        if (carId != null && carRepository.findById(carId) != null) {
             userActiveCars.put(userId, carId);
         }
     }
+
     public Car getCarById(UUID id) {
         return carRepository.findById(id);
     }
