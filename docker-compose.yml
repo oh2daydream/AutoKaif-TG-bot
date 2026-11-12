@@ -1,15 +1,11 @@
-version: '3.8'
-
 services:
   autokaif-bot:
-    build: src/main/java
+    build: .
     container_name: autokaif_bot
-    restart: always
-    # Позволяет боту на Linux напрямую обращаться к localhost:5433 сервера
+    restart: unless-stopped
     network_mode: "host"
+    env_file:
+      - .env
     environment:
       - DB_URL=jdbc:postgresql://localhost:5433/car_logbook?sslmode=disable
       - DB_USER=car_user
-      - DB_PASSWORD=${DB_PASSWORD}
-      - BOT_TOKEN=${BOT_TOKEN}
-      - BOT_NAME=${BOT_NAME}
