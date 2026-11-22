@@ -1,11 +1,8 @@
+# Собрка контейнера из образа
 services:
   autokaif-bot:
-    build: .
-    container_name: autokaif_bot
-    restart: unless-stopped
-    network_mode: "host"
-    env_file:
-      - .env
-    environment:
-      - DB_URL=jdbc:postgresql://localhost:5433/car_logbook?sslmode=disable
-      - DB_USER=car_user
+    build: . #откуда брать образ "из этой же папки из докерфайл
+    container_name: autokaif_bot #задаем имя контейнеру
+    restart: unless-stopped #если бот упал с ошибкой, то контейнер будет подниматься пока у я сам нее останволю
+    network_mode: host #используем всю сеть VPS для использования БД
+    env_file: .env
