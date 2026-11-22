@@ -1,23 +1,20 @@
 #!/bin/bash
+#при первой же ошибке останавливает запуск
 set -e
-
+#переходит в папку где лежит сам скрипт $0 путь к скрипту dirname отрезает от пути сам файл
 cd "$(dirname "$0")"
-
-echo "🔄 1. Подтягиваем свежие изменения из GitHub (ветка Develop)..."
-git pull origin Develop
-
-echo "🛑 2. Останавливаем и удаляем старый контейнер (если он запущен)..."
-docker rm -f autokaif_bot 2>/dev/null || true
-docker compose down 2>/dev/null || true
-
-echo "🏗️ 3. Собираем свежий образ и запускаем бота..."
-docker compose up -d --build --force-recreate
-
-echo "🧹 4. Удаляем старые неиспользуемые образы (экономим место на VPS)..."
+#обновляем проект и делем обычное обновление без merge комитов
+echo "обновляем develop"
+git pull --ff-only origin Develop
+#создает образ и запускает контейнер в фоне, если код изменился compose сам пересоздаст контейнер
+echo "Соборка свежего образа и запуск бота..."
+docker compose up -d --build
+#удаляем старые образы пересборки
+echo "Удаление старых неиспользуемых образов"
 docker image prune -f
 
-echo "✅ Статус контейнера:"
+echo "Статус контейнера:"
 docker compose ps
 
-echo "📋 Логи бота (для выхода из логов нажми Ctrl+C — сам бот продолжит работать):"
+echo "Логи:"
 docker compose logs -f --tail=30 autokaif-bot
