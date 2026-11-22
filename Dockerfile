@@ -14,6 +14,6 @@ FROM eclipse-temurin:21-jre-alpine
 # рабочая папка в новом образе
 WORKDIR /app
 #берет файл со сборки и берет только файл .jar и называет его app.jar
-COPY --from=builder /app/app.jar app.jar
+COPY --from=builder /app/target/app.jar app.jar
 #Задаем что будет запускаться "запуски main из app.jar
 ENTRYPOINT ["java", "-cp", "app.jar", "Main"]
