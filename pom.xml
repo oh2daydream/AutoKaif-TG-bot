@@ -64,6 +64,7 @@
     </dependencies>
 
     <build>
+	<finalName>app</finalName>	
         <plugins>
             <!-- Плагин компиляции под Java 21 -->
             <plugin>
