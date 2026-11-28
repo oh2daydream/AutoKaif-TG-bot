@@ -1,0 +1,25 @@
+# Собрка контейнера из образа "как правильно запускать контейнер"
+services:
+  autokaif-bot:
+    build: . #откуда брать образ "из этой же папки из докерфайл
+    restart: unless-stopped #если бот упал с ошибкой, то контейнер будет подниматься пока у я сам нее останволю
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: car_logbook
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d car_logbook" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  pgdata:

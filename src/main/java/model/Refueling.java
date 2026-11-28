@@ -1,19 +1,37 @@
 package model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Entity
+@Table(name = "refuelings")
 public class Refueling {
+    @Id
+    @Column(name = "id")
     private UUID id;
+    @Column(name = "car_id", nullable = false)
     private UUID carId;
+    @Column(name = "mileage", nullable = false)
     private int mileage;
+    @Column(name = "liters", nullable = false)
     private double liters;
+    @Column(name = "total_cost", nullable = false)
     private double totalCost;
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+    @Column(name = "is_full_tank", nullable = false)
     private boolean isFullTank;
 
-    public Refueling(UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
-        this.id = UUID.randomUUID();
+    protected Refueling() {
+    }
+
+    public Refueling(UUID id, UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
+        this.id = id;
         this.carId = carId;
         this.mileage = mileage;
         this.liters = liters;
@@ -22,24 +40,34 @@ public class Refueling {
         this.isFullTank = isFullTank;
     }
 
+    public Refueling(UUID carId, int mileage, double liters, double totalCost, LocalDate date, boolean isFullTank) {
+        this(UUID.randomUUID(), carId, mileage, liters, totalCost, date, isFullTank);
+    }
+
     public UUID getId() {
         return id;
     }
+
     public UUID getCarId() {
         return carId;
     }
+
     public int getMileage() {
         return mileage;
     }
+
     public double getLiters() {
         return liters;
     }
+
     public double getTotalCost() {
         return totalCost;
     }
+
     public LocalDate getDate() {
         return date;
     }
+
     public boolean isFullTank() {
         return isFullTank;
     }

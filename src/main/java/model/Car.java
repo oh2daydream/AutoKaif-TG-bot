@@ -1,19 +1,37 @@
 package model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.util.UUID;
 
+@Entity
+@Table(name = "cars")
 public class Car {
+    @Id
+    @Column(name = "id", nullable = false)
     private UUID id;
-    private final long userId;
-    private final String brand;
-    private final String model;
-    private final int year;
-    private final double tankCapacity;
+    @Column(name = "user_id", nullable = false)
+    private long userId;
+    @Column(name = "brand", nullable = false)
+    private String brand;
+    @Column(name = "model", nullable = false)
+    private String model;
+    @Column(name = "year", nullable = false)
+    private int year;
+    @Column(name = "tank_capacity", nullable = false)
+    private double tankCapacity;
+    @Column(name = "current_mileage", nullable = false)
     private int currentMileage;
 
-    public Car(UUID id,long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
-        this.id = id;
-        this.userId =  userId;
+    protected Car() {
+    }
+
+    public Car(UUID id, long userId, String brand, String model, int year, double tankCapacity, int currentMileage) {
+        this.id = (id != null) ? id : UUID.randomUUID();
+        this.userId = userId;
         this.brand = brand;
         this.model = model;
         this.year = year;
@@ -21,8 +39,8 @@ public class Car {
         this.currentMileage = currentMileage;
     }
 
-    public Car(String brand,long userId, String model, int year, double tankCapacity, int currentMileage) {
-        this(null,userId, brand, model, year, tankCapacity, currentMileage);
+    public Car(String brand, long userId, String model, int year, double tankCapacity, int currentMileage) {
+        this(null, userId, brand, model, year, tankCapacity, currentMileage);
     }
 
     //геттеры-----------------------------------------------------------------
@@ -30,7 +48,14 @@ public class Car {
         return id;
     }
 
-    public long getUserId(){return userId;}
+    //сеттер-----------------------------------------------------------------
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
 
     public String getBrand() {
         return brand;
@@ -50,11 +75,6 @@ public class Car {
 
     public int getCurrentMileage() {
         return currentMileage;
-    }
-
-    //сеттер-----------------------------------------------------------------
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     //методы-----------------------------------------------------------------
